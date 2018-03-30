@@ -85,6 +85,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
      - Get FITS data, coords length check handling, compute median for
        continuum case
      - Call gauss1d() to get aperture location for continuum case
+     - Extract 1-D spectra for continuum case
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -141,6 +142,11 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
             center0 = popt[2]
             sigma0  = popt[3]
 
+            idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
+            if axis==1:
+                spec1d = np.sum(spec2d[idx0,:], axis=axis)
+            if axis==0:
+                spec1d = np.sum(spec2d[:,idx0], axis=axis)
     #endfor
 
 #enddef
