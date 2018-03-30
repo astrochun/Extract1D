@@ -86,6 +86,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
        continuum case
      - Call gauss1d() to get aperture location for continuum case
      - Extract 1-D spectra for continuum case
+     - Define wavelength solution from FITS header
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -125,6 +126,16 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
         print("Exiting")
         return
 
+    if direction == 'x':
+        lam0_min  = spec2d_hdr['CRVAL1']
+        lam0_delt = spec2d_hdr['CDELT1']
+        n_pix     = spec2d_hdr['NAXIS1']
+    if direction == 'y':
+        lam0_min  = spec2d_hdr['CRVAL2']
+        lam0_delt = spec2d_hdr['CDELT2']
+        n_pix     = spec2d_hdr['NAXIS1']
+    lam0_arr = lam0_min + lam0_delt*np.arange(n_pix)
+
     for nn in range(n_aper):
         if len(coords[nn]) == 1: sp_type = 'cont'
         if len(coords[nn]) == 2: sp_type = 'line'
@@ -147,6 +158,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
                 spec1d = np.sum(spec2d[idx0,:], axis=axis)
             if axis==0:
                 spec1d = np.sum(spec2d[:,idx0], axis=axis)
+
     #endfor
 
 #enddef
