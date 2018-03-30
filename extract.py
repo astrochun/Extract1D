@@ -16,7 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from glob import glob
 
-def main(path0='', filename='', Instr='', coords=[]):
+def main(path0='', filename='', Instr='', coords=[], direction=''):
 
     '''
     Main function to perform extraction for input data
@@ -36,6 +36,10 @@ def main(path0='', filename='', Instr='', coords=[]):
     coords : list
       List of lists containing x,y coordinates in the image for each extraction
 
+    direction : str
+      Direction of extraction along spectra.  Either 'x' or 'y'
+      If Instr is specified, direction is not needed
+
     Returns
     -------
 
@@ -43,6 +47,7 @@ def main(path0='', filename='', Instr='', coords=[]):
     -----
     Created by Chun Ly, 30 March 2018
      - Bug fix: coordinates -> coords
+     - Add direction keyword input
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -63,6 +68,7 @@ def main(path0='', filename='', Instr='', coords=[]):
             filename0 = path0 + filename
     else:
         if Instr == 'MMIRS':
+            direction = 'x'
             srch0 = glob(path0+'sum_obj-sky_slits_corr.fits')
             if len(srch0) == 0:
                 print("## File not found!!!")
