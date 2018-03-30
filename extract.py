@@ -13,8 +13,39 @@ from astropy.io import fits
 
 import numpy as np
 
+from scipy.optimize import curve_fit
+
 import matplotlib.pyplot as plt
 from glob import glob
+
+def gauss1d(x, a0, a, x0, sigma):
+    '''
+    1-D gaussian function for curve_fit
+
+    Parameters
+    ----------
+    x : list or np.array
+      Pixel value along spectral direction
+
+    a0 : float
+      continuum level
+
+    a : float
+      Amplitude of Gaussian
+
+    x0 : float
+      Center of Gaussian
+
+    sigma : float
+      Gaussian sigma width
+
+    Notes
+    -----
+    Created by Chun Ly, 30 March 2018
+    '''
+
+    return a0 + a * np.exp(-(x - x0)**2 / (2 * sigma**2))
+#enddef
 
 def main(path0='', filename='', Instr='', coords=[], direction=''):
 
@@ -53,6 +84,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
      - Change coords handling style for continuum and non-continuum spectra
      - Get FITS data, coords length check handling, compute median for
        continuum case
+     - Call gauss1d() to get aperture location for continuum case
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -99,7 +131,16 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
         if direction == 'x': axis=1 # median over columns
         if direction == 'y': axis=0 # meidan over rows
         if sp_type == 'cont':
-            med0 = np.median(spec2d, axis=axis)
+            med0 = np.nanmedian(spec2d, axis=axis)
+            bad0 = np.where(np.isnan(med0))[0]
+            if len(bad0) > 0: med0[bad0] = 0.0
+            t_coord = coords[nn][0]
+            p0 = [0.0, med0[t_coord], t_coord, 2.0]
+            x0 = np.arange(len(med0))
+            popt, pcov = curve_fit(gauss1d, x0, med0, p0=p0)
+            center0 = popt[2]
+            sigma0  = popt[3]
+
     #endfor
 
 #enddef
