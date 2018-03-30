@@ -16,7 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from glob import glob
 
-def main(path0='', filename='', Instr='', coord=[]):
+def main(path0='', filename='', Instr='', coords=[]):
 
     '''
     Main function to perform extraction for input data
@@ -33,7 +33,7 @@ def main(path0='', filename='', Instr='', coord=[]):
       Instrument name. Options are 'MMIRS', 'GNIRS', 'MOSFIRE'
       By setting this, glob searches for default values
 
-    coord : list
+    coords : list
       List of lists containing x,y coordinates in the image for each extraction
 
     Returns
@@ -42,11 +42,12 @@ def main(path0='', filename='', Instr='', coord=[]):
     Notes
     -----
     Created by Chun Ly, 30 March 2018
+     - Bug fix: coordinates -> coords
     '''
 
-    if path0 == '' and filename == '' and Instr == '' and len(coord)==0:
+    if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
         print("### Call: main(path0='/path/to/data/', filename='spectra.fits',"+\
-              "Instr='', coord=[[x1,y1],[x2,y2]])")
+              "Instr='', coords=[[x1,y1],[x2,y2]])")
         print("### Must specify either path0 and Instr, path0 and filename, or"+\
               "filename, AND include list of coordinates")
         print("### Exiting!!!")
@@ -72,7 +73,7 @@ def main(path0='', filename='', Instr='', coord=[]):
 
     print("## Filename : "+filename0)
 
-    n_aper = len(coordinates)
+    n_aper = len(coords)
 
 #enddef
 
