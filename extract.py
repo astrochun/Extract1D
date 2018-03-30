@@ -34,7 +34,9 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
       By setting this, glob searches for default values
 
     coords : list
-      List of lists containing x,y coordinates in the image for each extraction
+      List of lists containing x,y coordinates in the image for each extraction.
+      Provide x or y only to indicate a continuum source.
+      Providing both x and y is intended for emission lines
 
     direction : str
       Direction of extraction along spectra.  Either 'x' or 'y'
@@ -48,11 +50,12 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
     Created by Chun Ly, 30 March 2018
      - Bug fix: coordinates -> coords
      - Add direction keyword input
+     - Change coords handling style for continuum and non-continuum spectra
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
         print("### Call: main(path0='/path/to/data/', filename='spectra.fits',"+\
-              "Instr='', coords=[[x1,y1],[x2,y2]])")
+              "Instr='', coords=[[x1,y1],[x2,y2],[y3]])")
         print("### Must specify either path0 and Instr, path0 and filename, or"+\
               "filename, AND include list of coordinates")
         print("### Exiting!!!")
