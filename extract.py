@@ -87,6 +87,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
      - Call gauss1d() to get aperture location for continuum case
      - Extract 1-D spectra for continuum case
      - Define wavelength solution from FITS header
+     - Bug fix: axis flipped for extraction via np.sum call
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -140,8 +141,8 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
         if len(coords[nn]) == 1: sp_type = 'cont'
         if len(coords[nn]) == 2: sp_type = 'line'
 
-        if direction == 'x': axis=1 # median over columns
-        if direction == 'y': axis=0 # meidan over rows
+        if direction == 'x': axis=1 # median over row
+        if direction == 'y': axis=0 # median over columns
         if sp_type == 'cont':
             med0 = np.nanmedian(spec2d, axis=axis)
             bad0 = np.where(np.isnan(med0))[0]
@@ -155,9 +156,9 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
 
             idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
             if axis==1:
-                spec1d = np.sum(spec2d[idx0,:], axis=axis)
+                spec1d = np.sum(spec2d[idx0,:], axis=0)
             if axis==0:
-                spec1d = np.sum(spec2d[:,idx0], axis=axis)
+                spec1d = np.sum(spec2d[:,idx0], axis=1)
 
     #endfor
 
