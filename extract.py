@@ -51,6 +51,8 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
      - Bug fix: coordinates -> coords
      - Add direction keyword input
      - Change coords handling style for continuum and non-continuum spectra
+     - Get FITS data, coords length check handling, compute median for
+       continuum case
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -81,8 +83,24 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
 
 
     print("## Filename : "+filename0)
+    spec2d, spec2d_hdr = fits.getdata(filename0, header=True)
 
     n_aper = len(coords)
+
+    if n_aper == 0:
+        print("## No aperture provided")
+        print("Exiting")
+        return
+
+    for nn in range(n_aper):
+        if len(coords[nn]) == 1: sp_type = 'cont'
+        if len(coords[nn]) == 2: sp_type = 'line'
+
+        if direction == 'x': axis=1 # median over columns
+        if direction == 'y': axis=0 # meidan over rows
+        if sp_type == 'cont':
+            med0 = np.median(spec2d, axis=axis)
+    #endfor
 
 #enddef
 
