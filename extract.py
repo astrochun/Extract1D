@@ -7,7 +7,7 @@ Main module for extraction of 1-D spectra from 2-D data
 
 import sys, os
 
-from os.path import exists
+from os.path import exists, dirname
 
 from astropy.io import fits
 
@@ -89,6 +89,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
      - Define wavelength solution from FITS header
      - Bug fix: axis flipped for extraction via np.sum call
      - Extract 1-D spectra for emission-line case
+     - Write 2-D FITS file of 1-D extracted spectra to file
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -138,6 +139,8 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
         n_pix     = spec2d_hdr['NAXIS1']
     lam0_arr = lam0_min + lam0_delt*np.arange(n_pix)
 
+    spec1d_arr = np.zeros((n_aper, len(lam0_arr)))
+
     for nn in range(n_aper):
         if len(coords[nn]) == 1: sp_type = 'cont'
         if len(coords[nn]) == 2: sp_type = 'line'
@@ -179,7 +182,20 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
         if axis==0:
             spec1d = np.sum(spec2d[:,idx0], axis=1)
 
+        spec1d_arr[nn,:] = spec1d
     #endfor
 
+    out_fits_file = dirname(filename0)+'/extract_1d.fits'
+    spec2d_hdr['CRVAL1'] = lam0_min
+    spec2d_hdr['CDELT1'] = lam0_delt
+    spec2d_hdr['CD1_1']  = lam0_delt
+
+    if direction == 'y':
+        del spec2d_hdr['CRVAL2']
+        del spec2d_hdr['CDELT2']
+        del spec2d_hdr['CD2_2']
+
+    print('### Writing : '+out_fits_file)
+    fits.writeto(out_fits_file, spec1d_arr, spec2d_hdr, overwrite=True)
 #enddef
 
