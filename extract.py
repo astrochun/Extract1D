@@ -18,6 +18,52 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 from glob import glob
 
+import logging
+
+class mlog:
+    '''
+    Main class to log information to stdout and ASCII file
+
+    To execute:
+    mylog = mlog(path0)._get_logger()
+
+    Parameters
+    ----------
+    path0 : str
+      Full path for where raw files are
+
+    Returns
+    -------
+
+    Notes
+    -----
+    Created by Chun Ly, 17 March 2018
+     - Identical to logging function in MMTtools.mmirs_pipeline_taskfile
+    '''
+
+    def __init__(self,path0):
+        self.LOG_FILENAME = path0 + 'extract.log'
+        self._log = self._get_logger()
+
+    def _get_logger(self):
+        loglevel = logging.INFO
+        log = logging.getLogger(self.LOG_FILENAME) # + Mod on 14/12/2017
+        if not getattr(log, 'handler_set', None):
+            log.setLevel(logging.INFO)
+            sh = logging.StreamHandler()
+            sh.setFormatter(formatter)
+            log.addHandler(sh)
+
+            fh = logging.FileHandler(self.LOG_FILENAME)
+            fh.setLevel(logging.INFO)
+            fh.setFormatter(formatter)
+            log.addHandler(fh)
+
+            log.setLevel(loglevel)
+            log.handler_set = True
+        return log
+#enddef
+
 def gauss1d(x, a0, a, x0, sigma):
     '''
     1-D gaussian function for curve_fit
