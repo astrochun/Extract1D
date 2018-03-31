@@ -18,7 +18,13 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 from glob import glob
 
+from astropy import log
+
 import logging
+formatter = logging.Formatter('%(asctime)s - %(module)12s.%(funcName)20s - %(levelname)s: %(message)s')
+sh = logging.StreamHandler(sys.stdout)
+sh.setLevel(logging.INFO)
+sh.setFormatter(formatter)
 
 class mlog:
     '''
@@ -37,8 +43,7 @@ class mlog:
 
     Notes
     -----
-    Created by Chun Ly, 17 March 2018
-     - Identical to logging function in MMTtools.mmirs_pipeline_taskfile
+    Created by Chun Ly, 30 March 2018
     '''
 
     def __init__(self,path0):
@@ -47,7 +52,7 @@ class mlog:
 
     def _get_logger(self):
         loglevel = logging.INFO
-        log = logging.getLogger(self.LOG_FILENAME) # + Mod on 14/12/2017
+        log = logging.getLogger(self.LOG_FILENAME)
         if not getattr(log, 'handler_set', None):
             log.setLevel(logging.INFO)
             sh = logging.StreamHandler()
@@ -137,20 +142,24 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
      - Extract 1-D spectra for emission-line case
      - Write 2-D FITS file of 1-D extracted spectra to file
      - Write 2-D FITS datacube containing 2-D spectra for each target
+     - Implement stdout and ASCII logging with mlog()
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
-        print("### Call: main(path0='/path/to/data/', filename='spectra.fits',"+\
-              "Instr='', coords=[[x1,y1],[x2,y2],[y3]])")
-        print("### Must specify either path0 and Instr, path0 and filename, or"+\
-              "filename, AND include list of coordinates")
-        print("### Exiting!!!")
+        log.warn("### Call: main(path0='/path/to/data/', filename='spec.fits',"+\
+                 "Instr='', coords=[[x1,y1],[x2,y2],[y3]])")
+        log.warn("### Must specify either path0 and Instr, path0 and filename,"+\
+                 " or filename, AND include list of coordinates")
+        log.warn("### Exiting!!!")
         return
     #endif
 
     if path0 != '':
         if path0[-1] != '/': path0 = path0 + '/'
 
+    mylog = mlog(path0)._get_logger()
+
+    mylog.info('Begin main ! ')
     if Instr == '':
         if path0 == '': filename0 = filename
         if path0 != '' and filename != '':
@@ -160,20 +169,21 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
             direction = 'x'
             srch0 = glob(path0+'sum_obj-sky_slits_corr.fits')
             if len(srch0) == 0:
-                print("## File not found!!!")
+                mylog.warn('File not found!!!')
             else:
                 filename0 = srch0[0]
         #endif
 
 
-    print("## Filename : "+filename0)
+    mylog.info("Input 2-D FITS file : ")
+    mylog.info(filename0)
     spec2d, spec2d_hdr = fits.getdata(filename0, header=True)
 
     n_aper = len(coords)
 
     if n_aper == 0:
-        print("## No aperture provided")
-        print("Exiting")
+        mylog.warn("No aperture provided")
+        mylog.warn("Exiting!!!")
         return
 
     if direction == 'x':
@@ -248,11 +258,13 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
         del spec2d_hdr['CD2_2']
 
     out_fits_file = dirname(filename0)+'/extract_1d.fits'
-    print('### Writing : '+out_fits_file)
+    mylog.info('Writing : '+out_fits_file)
     fits.writeto(out_fits_file, spec1d_arr, spec2d_hdr, overwrite=True)
 
     out_2d_fits_file = dirname(filename0)+'/extract_2d.fits'
-    print('### Writing : '+out_2d_fits_file)
+    mylog.info('Writing : '+out_2d_fits_file)
     fits.writeto(out_2d_fits_file, spec2d_arr, spec2d_hdr, overwrite=True)
+
+    mylog.info('End main ! ')
 
 #enddef
