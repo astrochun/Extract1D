@@ -38,10 +38,15 @@ def main(path0='', Instr='', zspec=[]):
 
     Returns
     -------
+    Write PDF files to path0 with filename of 'extract_1d_[AP].pdf'
+     Where AP is integer from 01 and one
 
     Notes
     -----
     Created by Chun Ly, 30 March 2018
+
+    Modified by Chun Ly, 31 March 2018
+     - Write PDF files
     '''
 
     if path0 == '' and Instr == '':
@@ -74,11 +79,9 @@ def main(path0='', Instr='', zspec=[]):
         l_min = l0_min * (1+zspec[nn])
         l_max = l0_max * (1+zspec[nn])
         x_idx = np.where((lam0_arr >= l_min) & (lam0_arr <= l_max))[0]
-        print len(x_idx)
         l_min, l_max = lam0_arr[x_idx[0]], lam0_arr[x_idx[-1]]
 
         tmpdata = data_2d[nn,10:20,x_idx].transpose()
-        print tmpdata.shape
         ax_arr[0].imshow(tmpdata, extent=[l_min,l_max,0,tmpdata.shape[0]],
                          cmap='gray')
 
@@ -98,6 +101,12 @@ def main(path0='', Instr='', zspec=[]):
             ax_arr[1].annotate(name, (x_val,1.05*max(ty)), xycoords='data',
                                va='bottom', ha='center', rotation=90,
                                color='blue')
-        #ax_arr[1].set_ylim(-1e7,1e7)
+        #endfor
+
+        out_pdf = '%sextract_1d_%02i.pdf' % (path0, nn+1)
+        print('### Writing : '+out_pdf)
+        fig.savefig(out_pdf, bbox_inches='tight')
+    #endfor
+
 #enddef
 
