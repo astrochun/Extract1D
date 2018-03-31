@@ -47,6 +47,7 @@ def main(path0='', Instr='', zspec=[]):
 
     Modified by Chun Ly, 31 March 2018
      - Write PDF files
+     - Plotting aesthetics, subplots_adjust for same x size
     '''
 
     if path0 == '' and Instr == '':
@@ -84,6 +85,9 @@ def main(path0='', Instr='', zspec=[]):
         tmpdata = data_2d[nn,10:20,x_idx].transpose()
         ax_arr[0].imshow(tmpdata, extent=[l_min,l_max,0,tmpdata.shape[0]],
                          cmap='gray')
+        ax_arr[0].set_ylabel(r'$y$ [pix]')
+        ax_arr[0].set_yticklabels([])
+        ax_arr[0].set_xticklabels([])
 
         tx, ty = lam0_arr[x_idx], data_1d[nn,x_idx]
         ax_arr[1].plot(tx, ty, 'k')
@@ -91,7 +95,6 @@ def main(path0='', Instr='', zspec=[]):
         ax_arr[1].set_ylim(1.2*min(ty), 1.3*max(ty))
         ax_arr[1].set_xlabel('Wavelengths (nm)')
         ax_arr[1].set_ylabel('Relative Flux')
-        ax_arr[1].set_yticklabels([])
         ax_arr[1].set_yticklabels([])
 
         for wave,name in zip(wave0,name0):
@@ -102,6 +105,9 @@ def main(path0='', Instr='', zspec=[]):
                                va='bottom', ha='center', rotation=90,
                                color='blue')
         #endfor
+
+        plt.subplots_adjust(left=0.025, bottom=0.025, top=0.975, right=0.975,
+                            wspace=0.03, hspace=0.03)
 
         out_pdf = '%sextract_1d_%02i.pdf' % (path0, nn+1)
         print('### Writing : '+out_pdf)
