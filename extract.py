@@ -88,6 +88,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
      - Extract 1-D spectra for continuum case
      - Define wavelength solution from FITS header
      - Bug fix: axis flipped for extraction via np.sum call
+     - Extract 1-D spectra for emission-line case
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -154,11 +155,29 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
             center0 = popt[2]
             sigma0  = popt[3]
 
-            idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
-            if axis==1:
-                spec1d = np.sum(spec2d[idx0,:], axis=0)
-            if axis==0:
-                spec1d = np.sum(spec2d[:,idx0], axis=1)
+        if sp_type == 'line':
+            if direction == 'x':
+                t_spec0 = spec2d[:,np.int(coords[nn][0]-1)]
+                t_coord = coords[nn][1]
+                t_peak  = t_spec0[t_coord]
+            if direction == 'y':
+                t_spec0 = spec2d[np.int(coords[nn][1]-1),:]
+                t_coord = coords[nn][0]
+                t_peak  = t_spec0[t_coord]
+            p0 = [0.0, t_peak, t_coord, 2.0]
+            x0 = np.arange(len(t_spec0))
+
+            bad0 = np.where(np.isnan(t_spec0))[0]
+            if len(bad0) > 0: t_spec0[bad0] = 0.0
+            popt, pcov = curve_fit(gauss1d, x0, t_spec0, p0=p0)
+            center0 = popt[2]
+            sigma0  = popt[3]
+
+        idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
+        if axis==1:
+            spec1d = np.sum(spec2d[idx0,:], axis=0)
+        if axis==0:
+            spec1d = np.sum(spec2d[:,idx0], axis=1)
 
     #endfor
 
