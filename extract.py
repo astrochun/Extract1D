@@ -90,6 +90,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
      - Bug fix: axis flipped for extraction via np.sum call
      - Extract 1-D spectra for emission-line case
      - Write 2-D FITS file of 1-D extracted spectra to file
+     - Write 2-D FITS datacube containing 2-D spectra for each target
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -140,6 +141,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
     lam0_arr = lam0_min + lam0_delt*np.arange(n_pix)
 
     spec1d_arr = np.zeros((n_aper, len(lam0_arr)))
+    spec2d_arr = np.zeros((n_aper, 30, len(lam0_arr)))
 
     for nn in range(n_aper):
         if len(coords[nn]) == 1: sp_type = 'cont'
@@ -177,15 +179,19 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
             sigma0  = popt[3]
 
         idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
+        idx1 = np.where(np.abs(x0 - center0) <= 15.0)[0]
         if axis==1:
-            spec1d = np.sum(spec2d[idx0,:], axis=0)
+            spec1d   = np.sum(spec2d[idx0,:], axis=0)
+            t_spec2d = spec2d[idx1,:]
         if axis==0:
-            spec1d = np.sum(spec2d[:,idx0], axis=1)
+            spec1d   = np.sum(spec2d[:,idx0], axis=1)
+            t_spec2d = spec2d[:,idx1]
 
         spec1d_arr[nn,:] = spec1d
+
+        spec2d_arr[nn,:,:] = t_spec2d
     #endfor
 
-    out_fits_file = dirname(filename0)+'/extract_1d.fits'
     spec2d_hdr['CRVAL1'] = lam0_min
     spec2d_hdr['CDELT1'] = lam0_delt
     spec2d_hdr['CD1_1']  = lam0_delt
@@ -195,7 +201,12 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
         del spec2d_hdr['CDELT2']
         del spec2d_hdr['CD2_2']
 
+    out_fits_file = dirname(filename0)+'/extract_1d.fits'
     print('### Writing : '+out_fits_file)
     fits.writeto(out_fits_file, spec1d_arr, spec2d_hdr, overwrite=True)
-#enddef
 
+    out_2d_fits_file = dirname(filename0)+'/extract_2d.fits'
+    print('### Writing : '+out_2d_fits_file)
+    fits.writeto(out_2d_fits_file, spec2d_arr, spec2d_hdr, overwrite=True)
+
+#enddef
