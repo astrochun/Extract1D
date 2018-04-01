@@ -1,31 +1,4 @@
-# This file contains most of the night sky OH lines.
-# All the lines belonging to the sequence Delta V=2 to 5, up
-# to V'=9 are included. All the levels with the rotational quantum 
-# number J lower than or equal to 16.5 have been considered.
-# 
-# The different columns contain the following data :
-# 
-# 1: Wavelengths in vacuum (Angstroms)
-# 2: Theoretical intensity, in relative units proportional to the 
-# flux of photons. The absolute flux is arbitrary.
-# 
-# These data have been computed by Philippe Rousselot (Observatory
-# of Besancon, France). The computations are based on the energy levels
-# published by Abrams et al., 1994 (Ap.J. Suppl. Seris 93, 351-395)
-# and on the transition probabilities published by Mies, 1974 (J.
-# of Mol. Spec. 53, 150-188). The upper relative populations have 
-# been computed by assuming a Boltzmann distribution with a rotational
-# temperature equal to 190 K and a vibrational temperature equal to
-# 9000 K. These values are approximate and the resulting relative
-# intensities should be regarded as indicative. The accuracy of 
-# the wavelengths is of the order of a few hundredth of Angstroms.
-# 
-# If you have any questions or comments concerning this list you
-# can send an E-mail to philippe@obs-besancon.fr.
-#
-# If you use this list for your work and puslish it, please refer to:
-# Rousselot et al., 2000, A & A, 354, 1134
-#
+#lambda  flux
 6138.239 1.258e-01
 6138.265 1.258e-01
 6138.466 3.361e-01
