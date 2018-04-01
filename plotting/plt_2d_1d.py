@@ -8,6 +8,7 @@ Code to plot 2-D data on top and 1-D on bottom
 from os.path import exists, dirname
 
 from astropy.io import fits
+import astropy.io.ascii as asc
 
 import numpy as np
 
@@ -27,7 +28,7 @@ rousselot_data = asc.read(rousselot_file, format='commented_header')
 wave0 = [6564.614, 6585.27, 6549.86, 6718.29, 6732.68]
 name0 = [r'H$\alpha$', '[NII]', '[NII]', '[SII]', '[SII]']
 
-def main(path0='', Instr='', zspec=[]):
+def main(path0='', Instr='', zspec=[], Rspec=3000):
 
     '''
     Main function to plot both the 2-D and 1-D spectra on the same PDF
@@ -44,6 +45,9 @@ def main(path0='', Instr='', zspec=[]):
       Instrument name. Options are 'MMIRS', 'GNIRS', 'MOSFIRE'
       By setting this, glob searches for default values
 
+    Rspec : float
+      Spectral resolution for OH skyline shading
+
     Returns
     -------
     Write PDF files to path0 with filename of 'extract_1d_[AP].pdf'
@@ -58,6 +62,7 @@ def main(path0='', Instr='', zspec=[]):
      - Plotting aesthetics, subplots_adjust for same x size
      - Switch to using GridSpec for subplots settings for 2D and 1D panels
      - Adjust grayscale normalization to zscale for imshow()
+     - Add Rspec keyword input; Shade regions affected by OH skylines
     '''
 
     if path0 == '' and Instr == '':
@@ -119,6 +124,20 @@ def main(path0='', Instr='', zspec=[]):
             ax2.annotate(name, (x_val,1.05*max(ty)), xycoords='data',
                                va='bottom', ha='center', rotation=90,
                                color='blue')
+        #endfor
+
+        #Shade OH skyline | + on 31/03/2018
+        OH_in = np.where((rousselot_data['lambda']/10.0 >= l_min) &
+                         (rousselot_data['lambda']/10.0 <= l_max))[0]
+        max_OH = max(rousselot_data['flux'][OH_in])
+
+        max_in = np.where(rousselot_data['flux'][OH_in] >= 0.25*max_OH)[0]
+        OH_idx = OH_in[max_in]
+        for ii in range(len(OH_idx)):
+            t_wave = rousselot_data['lambda'][OH_idx[ii]]/10.0
+            FWHM = t_wave/Rspec
+            ax2.axvspan(t_wave-FWHM/2.0,t_wave+FWHM/2.0, alpha=0.20,
+                        facecolor='black', edgecolor='none')
         #endfor
 
         plt.subplots_adjust(left=0.025, bottom=0.025, top=0.975, right=0.975,
