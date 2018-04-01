@@ -44,6 +44,9 @@ def main(wave, spec1d, OH_arr, ax):
     Created by Chun Ly, 1 April 2018
      - Use OH skyline mask to determine median
      - Set boundaries for curve_fit fitting
+     - Compute one rms for all lines
+     - Mask around emission lines
+     - Plot rms
     '''
 
     lamb0 = spec1d['wave']
@@ -51,10 +54,18 @@ def main(wave, spec1d, OH_arr, ax):
 
     n_lines = len(wave)
 
+    for ii in range(n_lines):
+        idx = [xx for xx in range(len(lamb0)) if
+               np.abs(lamb0[xx]-wave[ii]) < 1.0]
+        print ii, len(idx)
+        if len(idx) > 0: OH_arr[idx] = 1
+
     unmask = np.where(OH_arr == 0)[0]
     med0 = np.median(flux0[unmask])
     #ax.axhline(y=med0,color='magenta')
 
+    rms0 = np.std(flux0[unmask])
+    print rms0
     for ii in range(n_lines):
         idx = [xx for xx in range(len(lamb0)) if
                np.abs(lamb0[xx]-wave[ii]) < 1.0]
@@ -68,9 +79,11 @@ def main(wave, spec1d, OH_arr, ax):
         sigma0  = popt[3]
         sig_idx = np.where(np.abs(lamb0-center0)/sigma0 <= 2.5)[0]
         int_flux = np.sum(flux0[sig_idx] - popt[0])
-        print ii, wave[ii], center0, sigma0, int_flux
-        ax.plot(lamb0, gauss1d(lamb0, *popt), color='g')
 
+
+        print ii, wave[ii], center0, sigma0, int_flux, len(sig_idx), rms0, rms0*np.sqrt(len(sig_idx))
+        ax.plot(lamb0, gauss1d(lamb0, *popt), color='g')
+        ax.axhspan(med0-rms0,med0+rms0, facecolor='red', alpha=0.2)
     return ax
 #enddef
 
