@@ -57,6 +57,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
      - Started as a copy of plt_2d_1d.py
     Modified by Chun Ly, 1 April 2018
      - Import plotting.line_fitting and call line_fitting.main to fit lines
+     - Define OH masking array; Pass to line_fitting.main()
     '''
 
     if path0 == '' and Instr == '':
@@ -83,6 +84,8 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
     crval1, cdelt1 = hdr_2d['CRVAL1'], hdr_2d['CDELT1']
     lam0_arr = crval1 + cdelt1 * np.arange(hdr_2d['NAXIS1'])
 
+    OH_arr = np.zeros(len(lam0_arr))
+
     for nn in [1]:
         fig, ax = plt.subplots()
 
@@ -108,10 +111,6 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
                                color='blue', bbox=bbox_props)
         #endfor
 
-        wave = np.array(wave0)*(1+zspec[nn])/10.0
-        spec1d = {'wave': tx, 'flux': ty}
-        ax = line_fitting.main(wave, spec1d, ax)
-
         #Shade OH skyline
         OH_in = np.where((rousselot_data['lambda']/10.0 >= l_min) &
                          (rousselot_data['lambda']/10.0 <= l_max))[0]
@@ -124,7 +123,14 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
             FWHM = t_wave/Rspec
             ax.axvspan(t_wave-FWHM/2.0,t_wave+FWHM/2.0, alpha=0.20,
                        facecolor='black', edgecolor='none')
+            o_idx = np.where((lam0_arr >= t_wave-FWHM/2.0) &
+                             (lam0_arr <= t_wave+FWHM/2.0))[0]
+            if len(o_idx) > 0: OH_arr[o_idx] = 1
         #endfor
+
+        wave = np.array(wave0)*(1+zspec[nn])/10.0
+        spec1d = {'wave': tx, 'flux': ty}
+        ax = line_fitting.main(wave, spec1d, OH_arr[x_idx], ax)
 
         plt.subplots_adjust(left=0.025, bottom=0.025, top=0.975, right=0.975,
                             wspace=0.03, hspace=0.03)
