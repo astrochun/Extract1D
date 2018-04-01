@@ -14,6 +14,7 @@ from astropy.io import fits
 import numpy as np
 
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 import glob
 
 wave0 = [6564.614, 6585.27, 6549.86, 6718.29, 6732.68]
@@ -48,6 +49,7 @@ def main(path0='', Instr='', zspec=[]):
     Modified by Chun Ly, 31 March 2018
      - Write PDF files
      - Plotting aesthetics, subplots_adjust for same x size
+     - Switch to using GridSpec for subplots settings for 2D and 1D panels
     '''
 
     if path0 == '' and Instr == '':
@@ -75,7 +77,10 @@ def main(path0='', Instr='', zspec=[]):
     lam0_arr = crval1 + cdelt1 * np.arange(hdr_2d['NAXIS1'])
 
     for nn in [1]: #range(n_apers):
-        fig, ax_arr = plt.subplots(nrows=2, ncols=1)
+        gs1 = GridSpec(3, 1)
+
+        ax1 = plt.subplot(gs1[0])
+        ax2 = plt.subplot(gs1[1:3])
 
         l_min = l0_min * (1+zspec[nn])
         l_max = l0_max * (1+zspec[nn])
@@ -83,25 +88,25 @@ def main(path0='', Instr='', zspec=[]):
         l_min, l_max = lam0_arr[x_idx[0]], lam0_arr[x_idx[-1]]
 
         tmpdata = data_2d[nn,10:20,x_idx].transpose()
-        ax_arr[0].imshow(tmpdata, extent=[l_min,l_max,0,tmpdata.shape[0]],
-                         cmap='gray')
-        ax_arr[0].set_ylabel(r'$y$ [pix]')
-        ax_arr[0].set_yticklabels([])
-        ax_arr[0].set_xticklabels([])
+        ax1.imshow(tmpdata, extent=[l_min,l_max,0,tmpdata.shape[0]],
+                   cmap='gray')
+        ax1.set_ylabel(r'$y$ [pix]')
+        ax1.set_yticklabels([])
+        ax1.set_xticklabels([])
 
         tx, ty = lam0_arr[x_idx], data_1d[nn,x_idx]
-        ax_arr[1].plot(tx, ty, 'k')
-        ax_arr[1].set_xlim(l_min,l_max)
-        ax_arr[1].set_ylim(1.2*min(ty), 1.3*max(ty))
-        ax_arr[1].set_xlabel('Wavelengths (nm)')
-        ax_arr[1].set_ylabel('Relative Flux')
-        ax_arr[1].set_yticklabels([])
+        ax2.plot(tx, ty, 'k')
+        ax2.set_xlim(l_min,l_max)
+        ax2.set_ylim(1.2*min(ty), 1.3*max(ty))
+        ax2.set_xlabel('Wavelengths (nm)')
+        ax2.set_ylabel('Relative Flux')
+        ax2.set_yticklabels([])
 
         for wave,name in zip(wave0,name0):
             x_val = (1+zspec[nn])*wave/10.
-            ax_arr[0].axvline(x=x_val, color='red', linestyle='--')
-            ax_arr[1].axvline(x=x_val, color='red', linestyle='--')
-            ax_arr[1].annotate(name, (x_val,1.05*max(ty)), xycoords='data',
+            ax1.axvline(x=x_val, color='red', linestyle='--')
+            ax2.axvline(x=x_val, color='red', linestyle='--')
+            ax2.annotate(name, (x_val,1.05*max(ty)), xycoords='data',
                                va='bottom', ha='center', rotation=90,
                                color='blue')
         #endfor
@@ -111,6 +116,7 @@ def main(path0='', Instr='', zspec=[]):
 
         out_pdf = '%sextract_1d_%02i.pdf' % (path0, nn+1)
         print('### Writing : '+out_pdf)
+        fig = plt.gcf()
         fig.savefig(out_pdf, bbox_inches='tight')
     #endfor
 
