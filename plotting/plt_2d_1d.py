@@ -5,9 +5,7 @@ plt_2d_1d
 Code to plot 2-D data on top and 1-D on bottom
 """
 
-import sys, os
-
-from os.path import exists
+from os.path import exists, dirname
 
 from astropy.io import fits
 
@@ -16,6 +14,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import glob
+
+co_filename = __file__
+co_dir = dirname(co_filename)
+rousselot_file = co_dir + '/' + 'rousselot2000.dat'
+rousselot_data = asc.read(rousselot_file, format='commented_header')
 
 wave0 = [6564.614, 6585.27, 6549.86, 6718.29, 6732.68]
 name0 = [r'H$\alpha$', '[NII]', '[NII]', '[SII]', '[SII]']
