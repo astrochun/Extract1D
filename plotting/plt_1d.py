@@ -58,6 +58,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
     Modified by Chun Ly, 1 April 2018
      - Import plotting.line_fitting and call line_fitting.main to fit lines
      - Define OH masking array; Pass to line_fitting.main()
+     - Mask all OH skylines, not just those that are strongest
     '''
 
     if path0 == '' and Instr == '':
@@ -84,7 +85,14 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
     crval1, cdelt1 = hdr_2d['CRVAL1'], hdr_2d['CDELT1']
     lam0_arr = crval1 + cdelt1 * np.arange(hdr_2d['NAXIS1'])
 
+    # Mask all OH lines
     OH_arr = np.zeros(len(lam0_arr))
+    for ii in range(len(rousselot_data)):
+        t_wave = rousselot_data['lambda'][ii]/10.0
+        FWHM = 1.2*t_wave/Rspec
+        o_idx = np.where((lam0_arr >= t_wave-FWHM/2.0) &
+                         (lam0_arr <= t_wave+FWHM/2.0))[0]
+        if len(o_idx) > 0: OH_arr[o_idx] = 1
 
     for nn in [1]:
         fig, ax = plt.subplots()
@@ -123,9 +131,6 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
             FWHM = t_wave/Rspec
             ax.axvspan(t_wave-FWHM/2.0,t_wave+FWHM/2.0, alpha=0.20,
                        facecolor='black', edgecolor='none')
-            o_idx = np.where((lam0_arr >= t_wave-FWHM/2.0) &
-                             (lam0_arr <= t_wave+FWHM/2.0))[0]
-            if len(o_idx) > 0: OH_arr[o_idx] = 1
         #endfor
 
         wave = np.array(wave0)*(1+zspec[nn])/10.0
