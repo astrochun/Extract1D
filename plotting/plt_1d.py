@@ -21,6 +21,7 @@ rousselot_file = co_dir + '/' + 'rousselot2000.dat'
 rousselot_data = asc.read(rousselot_file, format='commented_header')
 
 from plt_2d_1d import wave0, name0
+import line_fitting
 
 bbox_props = dict(boxstyle="square,pad=0.15", fc="white",
                   alpha=1.0, ec="none")
@@ -54,6 +55,8 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
     -----
     Created by Chun Ly, 31 March 2018
      - Started as a copy of plt_2d_1d.py
+    Modified by Chun Ly, 1 April 2018
+     - Import plotting.line_fitting and call line_fitting.main to fit lines
     '''
 
     if path0 == '' and Instr == '':
@@ -104,6 +107,10 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
                                va='bottom', ha='center', rotation=90,
                                color='blue', bbox=bbox_props)
         #endfor
+
+        wave = np.array(wave0)*(1+zspec[nn])/10.0
+        spec1d = {'wave': tx, 'flux': ty}
+        ax = line_fitting.main(wave, spec1d, ax)
 
         #Shade OH skyline
         OH_in = np.where((rousselot_data['lambda']/10.0 >= l_min) &
