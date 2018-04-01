@@ -15,6 +15,10 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import glob
 
+from astropy.visualization.mpl_normalize import ImageNormalize
+from astropy.visualization import ZScaleInterval
+zscale = ZScaleInterval()
+
 co_filename = __file__
 co_dir = dirname(co_filename)
 rousselot_file = co_dir + '/' + 'rousselot2000.dat'
@@ -53,6 +57,7 @@ def main(path0='', Instr='', zspec=[]):
      - Write PDF files
      - Plotting aesthetics, subplots_adjust for same x size
      - Switch to using GridSpec for subplots settings for 2D and 1D panels
+     - Adjust grayscale normalization to zscale for imshow()
     '''
 
     if path0 == '' and Instr == '':
@@ -91,8 +96,10 @@ def main(path0='', Instr='', zspec=[]):
         l_min, l_max = lam0_arr[x_idx[0]], lam0_arr[x_idx[-1]]
 
         tmpdata = data_2d[nn,10:20,x_idx].transpose()
+        z1, z2 = zscale.get_limits(tmpdata)
+        norm = ImageNormalize(vmin=z1, vmax=z2)
         ax1.imshow(tmpdata, extent=[l_min,l_max,0,tmpdata.shape[0]],
-                   cmap='gray')
+                   cmap='gray', norm=norm)
         ax1.set_ylabel(r'$y$ [pix]')
         ax1.set_yticklabels([])
         ax1.set_xticklabels([])
