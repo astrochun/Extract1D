@@ -59,6 +59,9 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
      - Import plotting.line_fitting and call line_fitting.main to fit lines
      - Define OH masking array; Pass to line_fitting.main()
      - Mask all OH skylines, not just those that are strongest
+    Modified by Chun Ly, 3 April 2018
+     - Look over all apertures
+     - Handle case with zspec = -1 (no redshift available)
     '''
 
     if path0 == '' and Instr == '':
@@ -94,11 +97,16 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
                          (lam0_arr <= t_wave+FWHM/2.0))[0]
         if len(o_idx) > 0: OH_arr[o_idx] = 1
 
-    for nn in [1]:
+    for nn in range(n_apers):
         fig, ax = plt.subplots()
 
-        l_min = l0_min * (1+zspec[nn])
-        l_max = l0_max * (1+zspec[nn])
+        # Mod on 03/04/2018
+        if zspec[nn] == -1:
+            l_min, l_max = min(lam0_arr), max(lam0_arr)
+        else:
+            l_min = l0_min * (1+zspec[nn])
+            l_max = l0_max * (1+zspec[nn])
+
         x_idx = np.where((lam0_arr >= l_min) & (lam0_arr <= l_max))[0]
         l_min, l_max = lam0_arr[x_idx[0]], lam0_arr[x_idx[-1]]
 
@@ -111,13 +119,16 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         ax.set_ylabel('Relative Flux')
         ax.set_yticklabels([])
 
-        for wave,name in zip(wave0,name0):
-            x_val = (1+zspec[nn])*wave/10.
-            ax.axvline(x=x_val, color='blue', linestyle='--')
-            ax.annotate(name, (x_val,1.05*max(ty)), xycoords='data',
-                               va='bottom', ha='center', rotation=90,
-                               color='blue', bbox=bbox_props)
-        #endfor
+        # Mod on 03/04/2018
+        if zspec[nn] != -1:
+            for wave,name in zip(wave0,name0):
+                x_val = (1+zspec[nn])*wave/10.
+                ax.axvline(x=x_val, color='blue', linestyle='--')
+                ax.annotate(name, (x_val,1.05*max(ty)), xycoords='data',
+                            va='bottom', ha='center', rotation=90,
+                            color='blue', bbox=bbox_props)
+            #endfor
+        #endif
 
         #Shade OH skyline
         OH_in = np.where((rousselot_data['lambda']/10.0 >= l_min) &
@@ -133,9 +144,12 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
                        facecolor='black', edgecolor='none')
         #endfor
 
-        wave = np.array(wave0)*(1+zspec[nn])/10.0
-        spec1d = {'wave': tx, 'flux': ty}
-        ax = line_fitting.main(wave, spec1d, OH_arr[x_idx], ax)
+        # Mod on 03/04/2018
+        if zspec[nn] != -1:
+            wave = np.array(wave0)*(1+zspec[nn])/10.0
+            spec1d = {'wave': tx, 'flux': ty}
+            ax = line_fitting.main(wave, spec1d, OH_arr[x_idx], ax)
+        #endif
 
         plt.subplots_adjust(left=0.025, bottom=0.025, top=0.975, right=0.975,
                             wspace=0.03, hspace=0.03)
