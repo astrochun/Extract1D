@@ -65,6 +65,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
     Modified by Chun Ly, 9 April 2018
      - Handle NaN for plot limits for full spectral plots
      - Plot aesthetics: Limit y-axis lower end
+     - Plot aesthetics: 3-panel plot for full spectral plots
     '''
 
     if path0 == '' and Instr == '':
@@ -101,8 +102,6 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         if len(o_idx) > 0: OH_arr[o_idx] = 1
 
     for nn in range(n_apers):
-        fig, ax = plt.subplots()
-
         # Mod on 03/04/2018
         if zspec[nn] == -1:
             l_min, l_max = min(lam0_arr), max(lam0_arr)
@@ -119,13 +118,31 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
 
         ymin, ymax = -0.1*max(ty), 1.15*max(ty)
 
-        ax.plot(tx, ty, 'k')
-        ax.axhline(y=0, linestyle='dotted', color='black')
-        ax.set_xlim(l_min,l_max)
-        ax.set_ylim([ymin, ymax])
-        ax.set_xlabel('Wavelengths (nm)')
-        ax.set_ylabel('Relative Flux')
-        ax.set_yticklabels([])
+        if zspec[nn] != -1:
+            fig, ax = plt.subplots()
+
+            ax.plot(tx, ty, 'k')
+            ax.axhline(y=0, linestyle='dotted', color='black')
+            ax.set_xlim(l_min,l_max)
+            ax.set_ylim([ymin, ymax])
+            ax.set_xlabel('Wavelengths (nm)')
+            ax.set_ylabel('Relative Flux')
+            ax.set_yticklabels([])
+            hspace = 0.03
+        else:
+            fig, ax_arr = plt.subplots(nrows=3)
+
+            dx0 = (l_max-l_min) / 3.0
+            for aa in range(3):
+                ax_arr[aa].plot(tx, ty, 'k')
+                ax_arr[aa].axhline(y=0, linestyle='dotted', color='black')
+                ax_arr[aa].set_ylim([ymin, ymax])
+                ax_arr[aa].set_xlim([l_min+dx0*aa,l_min+dx0*(aa+1)])
+                ax_arr[aa].set_yticklabels([])
+
+            ax_arr[1].set_ylabel('Relative Flux')
+            ax_arr[2].set_xlabel('Wavelengths (nm)')
+            hspace = 0.125
 
         # Mod on 03/04/2018
         if zspec[nn] != -1:
@@ -160,7 +177,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         #endif
 
         plt.subplots_adjust(left=0.025, bottom=0.025, top=0.975, right=0.975,
-                            wspace=0.03, hspace=0.03)
+                            wspace=0.03, hspace=hspace)
 
         fig.set_size_inches(8,6)
 
