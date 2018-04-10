@@ -16,6 +16,8 @@ from scipy.optimize import curve_fit
 
 from ..extract import gauss1d
 
+bbox_props = dict(boxstyle="square,pad=0.15", fc="white", alpha=0.9, ec="none")
+
 def main(wave, spec1d, OH_arr, ax):
 
     '''
@@ -47,6 +49,8 @@ def main(wave, spec1d, OH_arr, ax):
      - Compute one rms for all lines
      - Mask around emission lines
      - Plot rms
+    Modified by Chun Ly, 9 April 2018
+     - Annotate plot with line fitting properties
     '''
 
     lamb0 = spec1d['wave']
@@ -66,6 +70,9 @@ def main(wave, spec1d, OH_arr, ax):
 
     rms0 = np.std(flux0[unmask])
     print rms0
+
+    fit_annot = ['', 'flux = ', r'$\sigma(\AA)$ = ', 'S/N = ']
+
     for ii in range(n_lines):
         idx = [xx for xx in range(len(lamb0)) if
                np.abs(lamb0[xx]-wave[ii]) < 1.0]
@@ -81,9 +88,22 @@ def main(wave, spec1d, OH_arr, ax):
         int_flux = np.sum(flux0[sig_idx] - popt[0])
 
 
-        print ii, wave[ii], center0, sigma0, int_flux, len(sig_idx), rms0, rms0*np.sqrt(len(sig_idx))
+        print ii, wave[ii], center0, sigma0, int_flux, len(sig_idx), rms0, \
+            rms0*np.sqrt(len(sig_idx))
         ax.plot(lamb0, gauss1d(lamb0, *popt), color='g')
-        ax.axhspan(med0-rms0,med0+rms0, facecolor='red', alpha=0.2)
+        if ii == 0: Ha_flux = int_flux
+
+        fit_annot[0] += '%.1f, ' % center0
+        fit_annot[1] += '%.3f, ' % (int_flux / Ha_flux)
+        fit_annot[2] += '%.1f, ' % (sigma0 * 10)
+        fit_annot[3] += '%.1f, ' % (int_flux / (rms0*np.sqrt(len(sig_idx))))
+    #endfor
+    fit_annot0 = '\n'.join([a[:-2] for a in fit_annot])
+    ax.annotate(fit_annot0, (0.025,0.90), ha='left', va='top', color='orange',
+                bbox=bbox_props, xycoords='axes fraction', zorder=6,
+                fontsize=10)
+
+    ax.axhspan(med0-rms0,med0+rms0, facecolor='red', alpha=0.2)
     return ax
 #enddef
 
