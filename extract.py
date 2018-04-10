@@ -98,6 +98,50 @@ def gauss1d(x, a0, a, x0, sigma):
     return a0 + a * np.exp(-(x - x0)**2 / (2 * sigma**2))
 #enddef
 
+def find_negative_images(x0, t_spec0, center0, peak):
+    '''
+    Identify location of negative images
+
+    Parameters
+    ----------
+    x0 : list or np.array
+      List or array of wavelengths or pixels
+
+    t_spec0 : np.array
+      Array of 1-D spectral cut of target/object
+
+    center0 : float
+      Location of center of positive spectra
+
+    peak : float
+      Amplitude of peak in positive spectra
+
+    Returns
+    -------
+
+    Notes
+    -----
+    Created by Chun Ly, 10 April 2018
+    '''
+
+    dist0 = x0 - center0
+
+    cen_pix = np.where(np.abs(dist0) == np.min(np.abs(dist0)))[0][0]
+
+    # Average in distance from peak to improve S/N. Flip for positive signal
+    # This assumes that the dithering is consistently spaced
+    cen_avg = -1*(t_spec0[0:cen_pix][::-1] + t_spec0[cen_pix:cen_pix*2])/2.0
+
+    new_x = np.arange(len(cen_avg))
+    np.savetxt('/Users/cly/Downloads/find_negative_images.txt',
+               np.c_[new_x, cen_avg])
+
+    neg_pos_guess = np.argmax(cen_avg)
+    p0 = [0.0, 0.5*peak, neg_pos_guess, 0.2]
+    popt, pcov = curve_fit(gauss1d, new_x, cen_avg, p0=p0)
+    print '## find negative images : ', popt
+#enddef
+
 def main(path0='', filename='', Instr='', coords=[], direction=''):
 
     '''
@@ -143,6 +187,8 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
      - Write 2-D FITS file of 1-D extracted spectra to file
      - Write 2-D FITS datacube containing 2-D spectra for each target
      - Implement stdout and ASCII logging with mlog()
+    Modified by Chun Ly, 10 April 2018
+     - Call find_negative_images()
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -196,8 +242,10 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
         n_pix     = spec2d_hdr['NAXIS1']
     lam0_arr = lam0_min + lam0_delt*np.arange(n_pix)
 
-    spec1d_arr = np.zeros((n_aper, len(lam0_arr)))
-    spec2d_arr = np.zeros((n_aper, 30, len(lam0_arr)))
+    spec1d_arr  = np.zeros((n_aper, len(lam0_arr)))
+    spec2d_arr  = np.zeros((n_aper, 30, len(lam0_arr)))
+    spec2d_neg1 = np.zeros((n_aper, 30, len(lam0_arr)))
+    spec2d_neg2 = np.zeros((n_aper, 30, len(lam0_arr)))
 
     for nn in range(n_aper):
         if len(coords[nn]) == 1: sp_type = 'cont'
@@ -233,6 +281,8 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
             popt, pcov = curve_fit(gauss1d, x0, t_spec0, p0=p0)
             center0 = popt[2]
             sigma0  = popt[3]
+
+        find_negative_images(x0, t_spec0, center0, popt[1])
 
         idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
         idx1 = np.where(np.abs(x0 - center0) <= 15.0)[0]
