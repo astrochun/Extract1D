@@ -62,6 +62,8 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
     Modified by Chun Ly, 3 April 2018
      - Look over all apertures
      - Handle case with zspec = -1 (no redshift available)
+    Modified by Chun Ly, 9 April 2018
+     - Handle NaN for plot limits for full spectral plots
     '''
 
     if path0 == '' and Instr == '':
@@ -111,10 +113,13 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         l_min, l_max = lam0_arr[x_idx[0]], lam0_arr[x_idx[-1]]
 
         tx, ty = lam0_arr[x_idx], data_1d[nn,x_idx]
+        nan_idx = np.where((np.isnan(ty) == True) | (np.isinf(ty) == True))[0]
+        if len(nan_idx) > 0: ty[nan_idx] = 0.0
+
         ax.plot(tx, ty, 'k')
         ax.axhline(y=0, linestyle='dotted', color='black')
         ax.set_xlim(l_min,l_max)
-        ax.set_ylim(1.2*min(ty), 1.15*max(ty))
+        ax.set_ylim(1.2*np.nanmin(ty), 1.15*np.nanmax(ty))
         ax.set_xlabel('Wavelengths (nm)')
         ax.set_ylabel('Relative Flux')
         ax.set_yticklabels([])
