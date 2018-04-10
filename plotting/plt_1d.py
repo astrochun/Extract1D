@@ -64,6 +64,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
      - Handle case with zspec = -1 (no redshift available)
     Modified by Chun Ly, 9 April 2018
      - Handle NaN for plot limits for full spectral plots
+     - Plot aesthetics: Limit y-axis lower end
     '''
 
     if path0 == '' and Instr == '':
@@ -116,10 +117,12 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         nan_idx = np.where((np.isnan(ty) == True) | (np.isinf(ty) == True))[0]
         if len(nan_idx) > 0: ty[nan_idx] = 0.0
 
+        ymin, ymax = -0.1*max(ty), 1.15*max(ty)
+
         ax.plot(tx, ty, 'k')
         ax.axhline(y=0, linestyle='dotted', color='black')
         ax.set_xlim(l_min,l_max)
-        ax.set_ylim(1.2*np.nanmin(ty), 1.15*np.nanmax(ty))
+        ax.set_ylim([ymin, ymax])
         ax.set_xlabel('Wavelengths (nm)')
         ax.set_ylabel('Relative Flux')
         ax.set_yticklabels([])
