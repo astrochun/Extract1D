@@ -121,6 +121,8 @@ def find_negative_images(x0, t_spec0, center0, peak, mylogger=None):
 
     Returns
     -------
+    neg_offset : float
+      Location of negative image relative to positive image in pixel units
 
     Notes
     -----
@@ -128,6 +130,7 @@ def find_negative_images(x0, t_spec0, center0, peak, mylogger=None):
 
     Modified by Chun Ly, 19 April 2018
      - Add mylogger keyword input: Implement stdout and ASCII logging
+     - Return neg_offset
     '''
 
     if type(mylogger) == type(None):
@@ -152,6 +155,8 @@ def find_negative_images(x0, t_spec0, center0, peak, mylogger=None):
     popt, pcov = curve_fit(gauss1d, new_x, cen_avg, p0=p0)
     mylog.info(str(popt))
 
+    neg_offset = popt[2]
+    return neg_offset
 #enddef
 
 def main(path0='', filename='', Instr='', coords=[], direction=''):
