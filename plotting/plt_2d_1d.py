@@ -63,6 +63,9 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
      - Switch to using GridSpec for subplots settings for 2D and 1D panels
      - Adjust grayscale normalization to zscale for imshow()
      - Add Rspec keyword input; Shade regions affected by OH skylines
+
+    Modified by Chun Ly, 19 April 2018
+     - Read in negative images; Display negative images in plots
     '''
 
     if path0 == '' and Instr == '':
@@ -77,11 +80,23 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
     fits_file_1d = path0 + 'extract_1d.fits'
     fits_file_2d = path0 + 'extract_2d.fits'
 
+    # + on 19/04/2018
+    fits_file_2d_N1 = path0 + 'extract_2d_neg1.fits'
+    fits_file_2d_N2 = path0 + 'extract_2d_neg2.fits'
+
     print('### Reading : '+fits_file_1d)
     data_1d, hdr_1d = fits.getdata(fits_file_1d, header=True)
 
     print('### Reading : '+fits_file_2d)
     data_2d, hdr_2d = fits.getdata(fits_file_2d, header=True)
+
+    # + on 19/04/2018
+    print('### Reading : '+fits_file_2d_N1)
+    data_2d_N1, hdr_2d_N1 = fits.getdata(fits_file_2d_N1, header=True)
+
+    # + on 19/04/2018
+    print('### Reading : '+fits_file_2d_N2)
+    data_2d_N2, hdr_2d_N2 = fits.getdata(fits_file_2d_N2, header=True)
 
     n_apers = hdr_1d['NAXIS2']
 
@@ -89,11 +104,15 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
     crval1, cdelt1 = hdr_2d['CRVAL1'], hdr_2d['CDELT1']
     lam0_arr = crval1 + cdelt1 * np.arange(hdr_2d['NAXIS1'])
 
-    for nn in [1]: #range(n_apers):
-        gs1 = GridSpec(3, 1)
+    for nn in [0]: #range(n_apers):
+        gs1 = GridSpec(6, 1) # Mod on 19/04/2018
 
-        ax1 = plt.subplot(gs1[0])
-        ax2 = plt.subplot(gs1[1:3])
+        ax1 = plt.subplot(gs1[1])
+        ax2 = plt.subplot(gs1[3:])
+
+        # + on 19/04/2018
+        axN1 = plt.subplot(gs1[0])
+        axN2 = plt.subplot(gs1[2])
 
         l_min = l0_min * (1+zspec[nn])
         l_max = l0_max * (1+zspec[nn])
@@ -108,6 +127,26 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         ax1.set_ylabel(r'$y$ [pix]')
         ax1.set_yticklabels([])
         ax1.set_xticklabels([])
+
+        # Plot above negative image | + on 19/04/2018
+        tmpdata = data_2d_N1[nn,10:20,x_idx].transpose()
+        z1, z2 = zscale.get_limits(tmpdata)
+        norm = ImageNormalize(vmin=z1, vmax=z2)
+        axN1.imshow(tmpdata, extent=[l_min,l_max,0,tmpdata.shape[0]],
+                    cmap='gray', norm=norm)
+        axN1.set_ylabel('')
+        axN1.set_yticklabels([])
+        axN1.set_xticklabels([])
+
+        # Plot below negative image | + on 19/04/2018
+        tmpdata = data_2d_N2[nn,10:20,x_idx].transpose()
+        z1, z2 = zscale.get_limits(tmpdata)
+        norm = ImageNormalize(vmin=z1, vmax=z2)
+        axN2.imshow(tmpdata, extent=[l_min,l_max,0,tmpdata.shape[0]],
+                    cmap='gray', norm=norm)
+        axN2.set_ylabel('')
+        axN2.set_yticklabels([])
+        axN2.set_xticklabels([])
 
         tx, ty = lam0_arr[x_idx], data_1d[nn,x_idx]
         ax2.plot(tx, ty, 'k')
