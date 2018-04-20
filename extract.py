@@ -98,7 +98,7 @@ def gauss1d(x, a0, a, x0, sigma):
     return a0 + a * np.exp(-(x - x0)**2 / (2 * sigma**2))
 #enddef
 
-def find_negative_images(x0, t_spec0, center0, peak):
+def find_negative_images(x0, t_spec0, center0, peak, mylogger=None):
     '''
     Identify location of negative images
 
@@ -116,13 +116,24 @@ def find_negative_images(x0, t_spec0, center0, peak):
     peak : float
       Amplitude of peak in positive spectra
 
+    mylogger : None type or class object
+      Class for stdout. If None given, then astropy.log used instead
+
     Returns
     -------
 
     Notes
     -----
     Created by Chun Ly, 10 April 2018
+
+    Modified by Chun Ly, 19 April 2018
+     - Add mylogger keyword input: Implement stdout and ASCII logging
     '''
+
+    if type(mylogger) == type(None):
+        mylog = log
+    else:
+        mylog = mylogger
 
     dist0 = x0 - center0
 
@@ -139,7 +150,8 @@ def find_negative_images(x0, t_spec0, center0, peak):
     neg_pos_guess = np.argmax(cen_avg)
     p0 = [0.0, 0.5*peak, neg_pos_guess, 0.2]
     popt, pcov = curve_fit(gauss1d, new_x, cen_avg, p0=p0)
-    print '## find negative images : ', popt
+    mylog.info(str(popt))
+
 #enddef
 
 def main(path0='', filename='', Instr='', coords=[], direction=''):
