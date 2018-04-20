@@ -209,6 +209,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
     Modified by Chun Ly, 19 April 2018
      - Typo fixed for NAXIS for y extraction
      - Get location of negative images using median of full 2-D image
+     - Get 2-D spectra of negative images; Write to FITS files
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -277,7 +278,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
     if len(bad0) > 0: t_spec2[bad0] = 0.0
     t_x0    = np.arange(len(t_spec2))
     center0 = np.argmax(t_spec2)
-    find_negative_images(t_x0, t_spec2, center0, np.max(t_spec2))
+    neg_off = find_negative_images(t_x0, t_spec2, center0, np.max(t_spec2))
 
     for nn in range(n_aper):
         if len(coords[nn]) == 1: sp_type = 'cont'
@@ -314,16 +315,32 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
 
         idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
         idx1 = np.where(np.abs(x0 - center0) <= 15.0)[0]
+
+        # + on 19/04/2018
+        idxN1 = np.where(np.abs(x0 - (center0+neg_off)) <= 15.0)[0]
+        idxN2 = np.where(np.abs(x0 - (center0-neg_off)) <= 15.0)[0]
         if axis==1:
             spec1d   = np.sum(spec2d[idx0,:], axis=0)
             t_spec2d = spec2d[idx1,:]
+
+            # + on 19/04/2018
+            t_spec2d_N1 = spec2d[idxN1,:]
+            t_spec2d_N2 = spec2d[idxN2,:]
         if axis==0:
             spec1d   = np.sum(spec2d[:,idx0], axis=1)
             t_spec2d = spec2d[:,idx1]
 
+            # + on 19/04/2018
+            t_spec2d_N1 = spec2d[:,idxN1]
+            t_spec2d_N2 = spec2d[:,idxN2]
+
         spec1d_arr[nn,:] = spec1d
 
         spec2d_arr[nn,:,:] = t_spec2d
+
+        # + on 19/04/2018
+        spec2d_neg1[nn,:,:] = t_spec2d_N1
+        spec2d_neg2[nn,:,:] = t_spec2d_N2
     #endfor
 
     spec2d_hdr['CRVAL1'] = lam0_min
@@ -342,6 +359,16 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
     out_2d_fits_file = dirname(filename0)+'/extract_2d.fits'
     mylog.info('Writing : '+out_2d_fits_file)
     fits.writeto(out_2d_fits_file, spec2d_arr, spec2d_hdr, overwrite=True)
+
+    # Write above negative image | + on 19/04/2018
+    out_2d_fits_file = dirname(filename0)+'/extract_2d_neg1.fits'
+    mylog.info('Writing : '+out_2d_fits_file)
+    fits.writeto(out_2d_fits_file, spec2d_neg1, spec2d_hdr, overwrite=True)
+
+    # Write below negative image | + on 19/04/2018
+    out_2d_fits_file = dirname(filename0)+'/extract_2d_neg2.fits'
+    mylog.info('Writing : '+out_2d_fits_file)
+    fits.writeto(out_2d_fits_file, spec2d_neg2, spec2d_hdr, overwrite=True)
 
     mylog.info('End main ! ')
 
