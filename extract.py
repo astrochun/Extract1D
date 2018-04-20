@@ -191,6 +191,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
      - Call find_negative_images()
     Modified by Chun Ly, 19 April 2018
      - Typo fixed for NAXIS for y extraction
+     - Get location of negative images using median of full 2-D image
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -249,12 +250,22 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
     spec2d_neg1 = np.zeros((n_aper, 30, len(lam0_arr)))
     spec2d_neg2 = np.zeros((n_aper, 30, len(lam0_arr)))
 
+    # Moved up on 19/04/2018
+    if direction == 'x': axis=1 # median over row
+    if direction == 'y': axis=0 # median over columns
+
+    # Find negative images (need one source with continuum | + on 19/04/2018
+    t_spec2 = np.nanmedian(spec2d, axis=axis)
+    bad0 = np.where(np.isnan(t_spec2))[0]
+    if len(bad0) > 0: t_spec2[bad0] = 0.0
+    t_x0    = np.arange(len(t_spec2))
+    center0 = np.argmax(t_spec2)
+    find_negative_images(t_x0, t_spec2, center0, np.max(t_spec2))
+
     for nn in range(n_aper):
         if len(coords[nn]) == 1: sp_type = 'cont'
         if len(coords[nn]) == 2: sp_type = 'line'
 
-        if direction == 'x': axis=1 # median over row
-        if direction == 'y': axis=0 # median over columns
         if sp_type == 'cont':
             med0 = np.nanmedian(spec2d, axis=axis)
             bad0 = np.where(np.isnan(med0))[0]
@@ -283,8 +294,6 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
             popt, pcov = curve_fit(gauss1d, x0, t_spec0, p0=p0)
             center0 = popt[2]
             sigma0  = popt[3]
-
-        find_negative_images(x0, t_spec0, center0, popt[1])
 
         idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
         idx1 = np.where(np.abs(x0 - center0) <= 15.0)[0]
