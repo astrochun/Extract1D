@@ -189,6 +189,8 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
      - Implement stdout and ASCII logging with mlog()
     Modified by Chun Ly, 10 April 2018
      - Call find_negative_images()
+    Modified by Chun Ly, 19 April 2018
+     - Typo fixed for NAXIS for y extraction
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -239,7 +241,7 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
     if direction == 'y':
         lam0_min  = spec2d_hdr['CRVAL2']
         lam0_delt = spec2d_hdr['CDELT2']
-        n_pix     = spec2d_hdr['NAXIS1']
+        n_pix     = spec2d_hdr['NAXIS2']
     lam0_arr = lam0_min + lam0_delt*np.arange(n_pix)
 
     spec1d_arr  = np.zeros((n_aper, len(lam0_arr)))
