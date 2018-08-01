@@ -159,7 +159,7 @@ def find_negative_images(x0, t_spec0, center0, peak, mylogger=None):
     return neg_offset
 #enddef
 
-def main(path0='', filename='', Instr='', coords=[], direction=''):
+def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
 
     '''
     Main function to perform extraction for input data
@@ -184,6 +184,9 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
     direction : str
       Direction of extraction along spectra.  Either 'x' or 'y'
       If Instr is specified, direction is not needed
+
+    dbfile : str
+      Full path to numpy file containing solution
 
     Returns
     -------
@@ -210,6 +213,8 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
      - Typo fixed for NAXIS for y extraction
      - Get location of negative images using median of full 2-D image
      - Get 2-D spectra of negative images; Write to FITS files
+    Modified by Chun Ly, 31 July 2018
+     - Add dbfile keyword; read in dbfile
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -271,6 +276,11 @@ def main(path0='', filename='', Instr='', coords=[], direction=''):
     # Moved up on 19/04/2018
     if direction == 'x': axis=1 # median over row
     if direction == 'y': axis=0 # median over columns
+
+    # Read in distortion database file | + on 31/07/2018
+    if dbfile != '':
+        mylog.info('Reading : '+dbfile)
+        distort_db = np.load(dbfile)
 
     # Find negative images (need one source with continuum | + on 19/04/2018
     t_spec2 = np.nanmedian(spec2d, axis=axis)
