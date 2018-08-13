@@ -186,7 +186,8 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
       If Instr is specified, direction is not needed
 
     dbfile : str
-      Full path to numpy file containing solution
+      Full path to numpy file containing solution. The solution should be
+      a polynomial fit and provided in the numpy array as 'best_fit'
 
     Returns
     -------
@@ -217,6 +218,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Add dbfile keyword; read in dbfile
     Modified by Chun Ly, 13 August 2018
      - Change MMIRS final stack file to use
+     - Define np.poly1d solution from db
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -283,6 +285,9 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
     if dbfile != '':
         mylog.info('Reading : '+dbfile)
         distort_db = np.load(dbfile)
+        db_best_fit = distort_db['best_fit']
+        pd = np.poly1d(db_best_fit)
+        distort_shift = pd(np.arange(n_pix))
 
     # Find negative images (need one source with continuum | + on 19/04/2018
     t_spec2 = np.nanmedian(spec2d, axis=axis)
@@ -324,6 +329,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
             popt, pcov = curve_fit(gauss1d, x0, t_spec0, p0=p0)
             center0 = popt[2]
             sigma0  = popt[3]
+
 
         idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
         idx1 = np.where(np.abs(x0 - center0) <= 15.0)[0]
