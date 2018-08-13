@@ -159,6 +159,29 @@ def find_negative_images(x0, t_spec0, center0, peak, mylogger=None):
     return neg_offset
 #enddef
 
+def db_index(center0, sigma0, distort_shift, direction=''):
+    '''
+    Computes indexing array using a distortion solution
+
+    center0 : float
+      Central value to use
+
+    sigma0 : float
+      Gaussian sigma from curve_fit [selection is done out to 3-sigma]
+
+    distort_shift: numpy.array
+      Numpy array containing the distortion as a function of wavelength
+      Generated from calling np.poly1d array:
+        pd = np.poly1d(db_best_fit)
+        distort_shift = pd(np.arange(n_pix)
+    '''
+
+    n_pix = len(distort_shift)
+
+    #for nn in range(n_pix):
+    #    np.arange(center0
+#enddef
+
 def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
 
     '''
