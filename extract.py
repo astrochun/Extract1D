@@ -215,6 +215,8 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Get 2-D spectra of negative images; Write to FITS files
     Modified by Chun Ly, 31 July 2018
      - Add dbfile keyword; read in dbfile
+    Modified by Chun Ly, 13 August 2018
+     - Change MMIRS final stack file to use
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -239,7 +241,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
     else:
         if Instr == 'MMIRS':
             direction = 'x'
-            srch0 = glob(path0+'sum_obj-sky_slits_corr.fits')
+            srch0 = glob(path0+'sum_all_obj-sky_slits_corr.fits')
             if len(srch0) == 0:
                 mylog.warn('File not found!!!')
             else:
