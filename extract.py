@@ -242,6 +242,8 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
     Modified by Chun Ly, 13 August 2018
      - Change MMIRS final stack file to use
      - Define np.poly1d solution from db
+    Modified by Chun Ly, 15 August 2018
+     - Code documentation
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -340,6 +342,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
                 t_spec0 = spec2d[:,np.int(coords[nn][0]-1)]
                 t_coord = coords[nn][1]
                 t_peak  = t_spec0[t_coord]
+
             if direction == 'y':
                 t_spec0 = spec2d[np.int(coords[nn][1]-1),:]
                 t_coord = coords[nn][0]
@@ -353,21 +356,20 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
             center0 = popt[2]
             sigma0  = popt[3]
 
-
         idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
         idx1 = np.where(np.abs(x0 - center0) <= 15.0)[0]
 
         # + on 19/04/2018
         idxN1 = np.where(np.abs(x0 - (center0+neg_off)) <= 15.0)[0]
         idxN2 = np.where(np.abs(x0 - (center0-neg_off)) <= 15.0)[0]
-        if axis==1:
+        if axis==1: #dispersion along x
             spec1d   = np.sum(spec2d[idx0,:], axis=0)
             t_spec2d = spec2d[idx1,:]
 
             # + on 19/04/2018
             t_spec2d_N1 = spec2d[idxN1,:]
             t_spec2d_N2 = spec2d[idxN2,:]
-        if axis==0:
+        if axis==0: #dispersion along y
             spec1d   = np.sum(spec2d[:,idx0], axis=1)
             t_spec2d = spec2d[:,idx1]
 
