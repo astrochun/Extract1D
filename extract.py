@@ -264,6 +264,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
     Modified by Chun Ly, 15 August 2018
      - Code documentation
      - Add Instr == 'GNIRS' case
+     - Index x0 from 1 instead of 0
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -358,7 +359,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
             if len(bad0) > 0: med0[bad0] = 0.0
             t_coord = coords[nn][0]
             p0 = [0.0, med0[t_coord], t_coord, 2.0]
-            x0 = np.arange(len(med0))
+            x0 = 1+np.arange(len(med0))
             popt, pcov = curve_fit(gauss1d, x0, med0, p0=p0)
             center0 = popt[2]
             sigma0  = popt[3]
@@ -374,7 +375,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
                 t_coord = coords[nn][0]
                 t_peak  = t_spec0[t_coord]
             p0 = [0.0, t_peak, t_coord, 2.0]
-            x0 = np.arange(len(t_spec0))
+            x0 = 1+np.arange(len(t_spec0))
 
             bad0 = np.where(np.isnan(t_spec0))[0]
             if len(bad0) > 0: t_spec0[bad0] = 0.0
