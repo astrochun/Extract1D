@@ -14,6 +14,7 @@ from astropy.io import fits
 import numpy as np
 
 from scipy.optimize import curve_fit
+from scipy.interpolate import interp1d
 
 import matplotlib.pyplot as plt
 from glob import glob
@@ -159,12 +160,17 @@ def find_negative_images(x0, t_spec0, center0, peak, mylogger=None):
     return neg_offset
 #enddef
 
-def db_index(center0, sigma0, distort_shift, direction=''):
+def db_index(center0, coords, sigma0, distort_shift, direction=''):
     '''
     Computes indexing array using a distortion solution
 
     center0 : float
       Central value to use
+
+    coords : list
+      (x,y) coordinate. This is to determine the necessary distortion shift
+      relative to the emission line. Generally from ds9, counts from 1
+      for first pixel
 
     sigma0 : float
       Gaussian sigma from curve_fit [selection is done out to 3-sigma]
@@ -177,6 +183,13 @@ def db_index(center0, sigma0, distort_shift, direction=''):
     '''
 
     n_pix = len(distort_shift)
+    ds_inter = interp1d(1+np.arange(n_pix), distort_shift)
+    if direction == 'y':
+        ds_offset = ds_inter(coords[1])
+    else:
+        ds_offset = ds_inter(coords[0])
+
+    ds_trace = center0 + (distort_shift - ds_offset)
 
     #for nn in range(n_pix):
     #    np.arange(center0
