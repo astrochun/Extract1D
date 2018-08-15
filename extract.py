@@ -269,6 +269,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Add Instr == 'GNIRS' case
      - Index x0 from 1 instead of 0
      - Call db_index()
+     - Proper indexing for spec1d with distortion dbfile
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -403,14 +404,20 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
         idxN1 = np.where(np.abs(x0 - (center0+neg_off)) <= 15.0)[0]
         idxN2 = np.where(np.abs(x0 - (center0-neg_off)) <= 15.0)[0]
         if axis==1: #dispersion along x
-            spec1d   = np.sum(spec2d[idx0,:], axis=0)
+            if dbfile == '':
+                spec1d = np.sum(spec2d[idx0,:], axis=0)
+            else:
+                spec1d = np.sum(spec2d[idx0], axis=0)
             t_spec2d = spec2d[idx1,:]
 
             # + on 19/04/2018
             t_spec2d_N1 = spec2d[idxN1,:]
             t_spec2d_N2 = spec2d[idxN2,:]
         if axis==0: #dispersion along y
-            spec1d   = np.sum(spec2d[:,idx0], axis=1)
+            if dbfile == '':
+                spec1d = np.sum(spec2d[:,idx0], axis=1)
+            else:
+                spec1d = np.sum(spec2d[idx0], axis=1)
             t_spec2d = spec2d[:,idx1]
 
             # + on 19/04/2018
