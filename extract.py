@@ -160,7 +160,7 @@ def find_negative_images(x0, t_spec0, center0, peak, mylogger=None):
     return neg_offset
 #enddef
 
-def db_index(center0, coords, sigma0, distort_shift, direction=''):
+def db_index(center0, coords, sigma0, distort_shift, direction='', spec2d_shape):
     '''
     Computes indexing array using a distortion solution
 
@@ -186,13 +186,19 @@ def db_index(center0, coords, sigma0, distort_shift, direction=''):
     ds_inter = interp1d(1+np.arange(n_pix), distort_shift)
     if direction == 'y':
         ds_offset = ds_inter(coords[1])
+        x0 = np.arange(spec2d_shape[1])
     else:
         ds_offset = ds_inter(coords[0])
+        x0 = np.arange(spec2d_shape[0])
 
     ds_trace = center0 + (distort_shift - ds_offset)
 
-    #for nn in range(n_pix):
-    #    np.arange(center0
+    tmp_idx = np.zeros(spec2d_shape)
+    for nn in range(n_pix):
+        t_idx = np.where(np.abs(x0-ds_trace[nn])/sigma0 <= 3.0)[0]
+        if len(t_idx) > 0:
+            tmp_idx[nn,t_idx] = 1
+
 #enddef
 
 def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
