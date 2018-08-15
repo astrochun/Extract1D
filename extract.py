@@ -199,6 +199,9 @@ def db_index(center0, coords, sigma0, distort_shift, direction='', spec2d_shape)
         if len(t_idx) > 0:
             tmp_idx[nn,t_idx] = 1
 
+    distort_idx = np.where(tmp_idx == 1)
+
+    return distort_idx, tmp_idx
 #enddef
 
 def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
