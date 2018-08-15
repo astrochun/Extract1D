@@ -257,6 +257,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Define np.poly1d solution from db
     Modified by Chun Ly, 15 August 2018
      - Code documentation
+     - Add Instr == 'GNIRS' case
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -286,7 +287,13 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
                 mylog.warn('File not found!!!')
             else:
                 filename0 = srch0[0]
-        #endif
+        if Instr == 'GNIRS':
+            direction = 'y'
+            srch0 = glob(path0+'obj_comb.fits')
+            if len(srch0) == 0:
+                mylog.warn('File not found!!!')
+            else:
+                filename0 = srch0[0]
 
 
     mylog.info("Input 2-D FITS file : ")
