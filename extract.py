@@ -268,6 +268,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Code documentation
      - Add Instr == 'GNIRS' case
      - Index x0 from 1 instead of 0
+     - Call db_index()
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -367,6 +368,9 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
             center0 = popt[2]
             sigma0  = popt[3]
 
+            # Temporary
+            idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
+
         if sp_type == 'line':
             if direction == 'x':
                 t_spec0 = spec2d[:,np.int(coords[nn][0]-1)]
@@ -386,7 +390,13 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
             center0 = popt[2]
             sigma0  = popt[3]
 
-        idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
+            if dbfile == '':
+                idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
+            else:
+                idx0, tmp_idx = db_index(center0, coords[nn], sigma0,
+                                         distort_shift, direction=direction,
+                                         spec2d.shape)
+
         idx1 = np.where(np.abs(x0 - center0) <= 15.0)[0]
 
         # + on 19/04/2018
