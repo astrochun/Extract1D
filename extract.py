@@ -186,10 +186,10 @@ def db_index(center0, coords, sigma0, distort_shift, direction='', spec2d_shape)
     ds_inter = interp1d(1+np.arange(n_pix), distort_shift)
     if direction == 'y':
         ds_offset = ds_inter(coords[1])
-        x0 = np.arange(spec2d_shape[1])
+        x0 = 1+np.arange(spec2d_shape[1])
     else:
         ds_offset = ds_inter(coords[0])
-        x0 = np.arange(spec2d_shape[0])
+        x0 = 1+np.arange(spec2d_shape[0])
 
     ds_trace = center0 + (distort_shift - ds_offset)
 
