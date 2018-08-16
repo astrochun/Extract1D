@@ -270,6 +270,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Index x0 from 1 instead of 0
      - Call db_index()
      - Proper indexing for spec1d with distortion dbfile
+     - Use nearest solution for continuum extraction case
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -369,8 +370,16 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
             center0 = popt[2]
             sigma0  = popt[3]
 
-            # Temporary
-            idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
+            if dbfile == '':
+                idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
+            else:
+                c_diff = np.abs(center0 - distort_db['xcen_arr'])
+                idx_near = np.where(c_diff == np.min(c_diff))[0]
+                mylogger.info('Nearest solution found : '+\
+                              str(distort_db['xcen_arr'][idx_near]))
+                cont_best_fit = distort_db['fit_arr'][idx_near]
+                cont_pd = np.poly1d(cont_best_fit)
+                cont_distort_shift = cont_pd(np.arange(n_pix))
 
         if sp_type == 'line':
             if direction == 'x':
