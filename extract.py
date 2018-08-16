@@ -271,6 +271,8 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Call db_index()
      - Proper indexing for spec1d with distortion dbfile
      - Use nearest solution for continuum extraction case
+    Modified by Chun Ly, 16 August 2018
+     - Fix mylog typo
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -375,7 +377,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
             else:
                 c_diff = np.abs(center0 - distort_db['xcen_arr'])
                 idx_near = np.where(c_diff == np.min(c_diff))[0]
-                mylogger.info('Nearest solution found : '+\
+                mylog.info('Nearest solution found : '+\
                               str(distort_db['xcen_arr'][idx_near]))
                 cont_best_fit = distort_db['fit_arr'][idx_near]
                 cont_pd = np.poly1d(cont_best_fit)
