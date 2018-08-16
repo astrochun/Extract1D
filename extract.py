@@ -273,6 +273,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Use nearest solution for continuum extraction case
     Modified by Chun Ly, 16 August 2018
      - Fix mylog typo
+     - Fix to get proper poly1d fit for cont case
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -345,6 +346,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
     if dbfile != '':
         mylog.info('Reading : '+dbfile)
         distort_db = np.load(dbfile)
+        db_xcen     = distort_db['xcen_arr'][0]
         db_best_fit = distort_db['best_fit']
         pd = np.poly1d(db_best_fit)
         distort_shift = pd(np.arange(n_pix))
@@ -375,11 +377,11 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
             if dbfile == '':
                 idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
             else:
-                c_diff = np.abs(center0 - distort_db['xcen_arr'])
-                idx_near = np.where(c_diff == np.min(c_diff))[0]
+                c_diff = np.abs(center0 - db_xcen)
+                idx_near = np.where(c_diff == np.min(c_diff))[0][0]
                 mylog.info('Nearest solution found : '+\
-                              str(distort_db['xcen_arr'][idx_near]))
-                cont_best_fit = distort_db['fit_arr'][idx_near]
+                              str(db_xcen[idx_near]))
+                cont_best_fit = distort_db['fit_arr'][0][idx_near]
                 cont_pd = np.poly1d(cont_best_fit)
                 cont_distort_shift = cont_pd(np.arange(n_pix))
 
