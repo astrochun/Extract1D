@@ -276,6 +276,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Fix to get proper poly1d fit for cont case
      - Call db_index() for cont case
      - Use np.multiply to np.sum with proper axis
+     - Use np.transpose for spec2d (direction='y')
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -437,11 +438,11 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
                 spec1d = np.sum(spec2d[:,idx0], axis=1)
             else:
                 spec1d = np.sum(np.multiply(spec2d, tmp_idx), axis=1)
-            t_spec2d = spec2d[:,idx1]
+            t_spec2d = np.transpose(spec2d[:,idx1])
 
             # + on 19/04/2018
-            t_spec2d_N1 = spec2d[:,idxN1]
-            t_spec2d_N2 = spec2d[:,idxN2]
+            t_spec2d_N1 = np.transpose(spec2d[:,idxN1])
+            t_spec2d_N2 = np.transpose(spec2d[:,idxN2])
 
         spec1d_arr[nn,:] = spec1d
 
