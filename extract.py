@@ -274,6 +274,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
     Modified by Chun Ly, 16 August 2018
      - Fix mylog typo
      - Fix to get proper poly1d fit for cont case
+     - Call db_index() for cont case
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -384,6 +385,10 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
                 cont_best_fit = distort_db['fit_arr'][0][idx_near]
                 cont_pd = np.poly1d(cont_best_fit)
                 cont_distort_shift = cont_pd(np.arange(n_pix))
+
+                idx0, tmp_idx = db_index(center0, coords[nn], sigma0,
+                                         cont_distort_shift, spec2d.shape,
+                                         direction=direction)
 
         if sp_type == 'line':
             if direction == 'x':
