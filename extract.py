@@ -231,8 +231,9 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
       If Instr is specified, direction is not needed
 
     dbfile : str
-      Full path to numpy file containing solution. The solution should be
-      a polynomial fit and provided in the numpy array as 'best_fit'
+      Filename to numpy file containing solution. File is relative to path0.
+      The solution should be a polynomial fit and provided in the numpy array
+      as 'best_fit'. For continuum source, we use 'fit_arr'
 
     Returns
     -------
@@ -277,6 +278,8 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Call db_index() for cont case
      - Use np.multiply to np.sum with proper axis
      - Use np.transpose for spec2d (direction='y')
+    Modified by Chun Ly, 17 August 2018
+     - Change dbfile to filename (relative to path0)
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -347,8 +350,8 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
 
     # Read in distortion database file | + on 31/07/2018
     if dbfile != '':
-        mylog.info('Reading : '+dbfile)
-        distort_db = np.load(dbfile)
+        mylog.info('Reading : '+path0+dbfile)
+        distort_db = np.load(path0+dbfile)
         db_xcen     = distort_db['xcen_arr'][0]
         db_best_fit = distort_db['best_fit']
         pd = np.poly1d(db_best_fit)
