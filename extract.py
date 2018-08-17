@@ -280,6 +280,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Use np.transpose for spec2d (direction='y')
     Modified by Chun Ly, 17 August 2018
      - Change dbfile to filename (relative to path0)
+     - Change med0 (use center) for cont case; Call db_index correctly
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -370,7 +371,11 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
         if len(coords[nn]) == 2: sp_type = 'line'
 
         if sp_type == 'cont':
-            med0 = np.nanmedian(spec2d, axis=axis)
+            if direction == 'y':
+                med0 = spec2d[n_pix/2] #np.nanmedian(spec2d, axis=axis)
+            if direction == 'x':
+                med0 = spec2d[:,n_pix/2]
+
             bad0 = np.where(np.isnan(med0))[0]
             if len(bad0) > 0: med0[bad0] = 0.0
             t_coord = coords[nn][0]
@@ -391,7 +396,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
                 cont_pd = np.poly1d(cont_best_fit)
                 cont_distort_shift = cont_pd(np.arange(n_pix))
 
-                idx0, tmp_idx = db_index(center0, coords[nn], sigma0,
+                idx0, tmp_idx = db_index(center0, [coords[nn],n_pix/2], sigma0,
                                          cont_distort_shift, spec2d.shape,
                                          direction=direction)
 
