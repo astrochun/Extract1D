@@ -66,6 +66,8 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
      - Handle NaN for plot limits for full spectral plots
      - Plot aesthetics: Limit y-axis lower end
      - Plot aesthetics: 3-panel plot for full spectral plots
+    Modified by Chun Ly, 17 August 2018
+     - Define l_scale for wavelength transformation
     '''
 
     if path0 == '' and Instr == '':
@@ -95,7 +97,10 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
     # Mask all OH lines
     OH_arr = np.zeros(len(lam0_arr))
     for ii in range(len(rousselot_data)):
-        t_wave = rousselot_data['lambda'][ii]/10.0
+        if Instr == 'MMIRS': l_scale = 10.0
+        if Instr == 'GNIRS': l_scale = 1.0
+        t_wave = rousselot_data['lambda'][ii]/l_scale
+
         FWHM = 1.2*t_wave/Rspec
         o_idx = np.where((lam0_arr >= t_wave-FWHM/2.0) &
                          (lam0_arr <= t_wave+FWHM/2.0))[0]
@@ -147,7 +152,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         # Mod on 03/04/2018
         if zspec[nn] != -1:
             for wave,name in zip(wave0,name0):
-                x_val = (1+zspec[nn])*wave/10.
+                x_val = (1+zspec[nn])*wave/l_scale
                 ax.axvline(x=x_val, color='blue', linestyle='--')
                 ax.annotate(name, (x_val,1.05*max(ty)), xycoords='data',
                             va='bottom', ha='center', rotation=90,
@@ -156,14 +161,14 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         #endif
 
         #Shade OH skyline
-        OH_in = np.where((rousselot_data['lambda']/10.0 >= l_min) &
-                         (rousselot_data['lambda']/10.0 <= l_max))[0]
+        OH_in = np.where((rousselot_data['lambda']/l_scale >= l_min) &
+                         (rousselot_data['lambda']/l_scale <= l_max))[0]
         max_OH = max(rousselot_data['flux'][OH_in])
 
         max_in = np.where(rousselot_data['flux'][OH_in] >= 0.25*max_OH)[0]
         OH_idx = OH_in[max_in]
         for ii in range(len(OH_idx)):
-            t_wave = rousselot_data['lambda'][OH_idx[ii]]/10.0
+            t_wave = rousselot_data['lambda'][OH_idx[ii]]/l_scale
             FWHM = t_wave/Rspec
             ax.axvspan(t_wave-FWHM/2.0,t_wave+FWHM/2.0, alpha=0.20,
                        facecolor='black', edgecolor='none')
