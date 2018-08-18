@@ -69,6 +69,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
     Modified by Chun Ly, 17 August 2018
      - Define l_scale for wavelength transformation
      - Fix ax.axvspan bug for zspec=-1
+     - Fix spectral range (proper units)
     '''
 
     if path0 == '' and Instr == '':
@@ -112,8 +113,8 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         if zspec[nn] == -1:
             l_min, l_max = min(lam0_arr), max(lam0_arr)
         else:
-            l_min = l0_min * (1+zspec[nn])
-            l_max = l0_max * (1+zspec[nn])
+            l_min = l0_min * (10./l_scale) * (1+zspec[nn])
+            l_max = l0_max * (10./l_scale) * (1+zspec[nn])
 
         x_idx = np.where((lam0_arr >= l_min) & (lam0_arr <= l_max))[0]
         l_min, l_max = lam0_arr[x_idx[0]], lam0_arr[x_idx[-1]]
