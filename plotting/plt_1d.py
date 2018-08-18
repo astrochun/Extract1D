@@ -70,6 +70,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
      - Define l_scale for wavelength transformation
      - Fix ax.axvspan bug for zspec=-1
      - Fix spectral range (proper units)
+     - Correct wave (proper units)
     '''
 
     if path0 == '' and Instr == '':
@@ -180,7 +181,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
 
         # Mod on 03/04/2018
         if zspec[nn] != -1:
-            wave = np.array(wave0)*(1+zspec[nn])/10.0
+            wave = np.array(wave0)*(1+zspec[nn])/l_scale
             spec1d = {'wave': tx, 'flux': ty}
             ax = line_fitting.main(wave, spec1d, OH_arr[x_idx], ax)
         #endif
