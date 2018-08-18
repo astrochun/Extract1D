@@ -68,6 +68,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
      - Plot aesthetics: 3-panel plot for full spectral plots
     Modified by Chun Ly, 17 August 2018
      - Define l_scale for wavelength transformation
+     - Fix ax.axvspan bug for zspec=-1
     '''
 
     if path0 == '' and Instr == '':
@@ -170,8 +171,10 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         for ii in range(len(OH_idx)):
             t_wave = rousselot_data['lambda'][OH_idx[ii]]/l_scale
             FWHM = t_wave/Rspec
-            ax.axvspan(t_wave-FWHM/2.0,t_wave+FWHM/2.0, alpha=0.20,
-                       facecolor='black', edgecolor='none')
+
+            if zspec[nn] != -1:
+                ax.axvspan(t_wave-FWHM/2.0,t_wave+FWHM/2.0, alpha=0.20,
+                           facecolor='black', edgecolor='none')
         #endfor
 
         # Mod on 03/04/2018
