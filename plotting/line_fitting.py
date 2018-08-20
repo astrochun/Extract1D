@@ -51,6 +51,8 @@ def main(wave, spec1d, OH_arr, ax):
      - Plot rms
     Modified by Chun Ly, 9 April 2018
      - Annotate plot with line fitting properties
+    Modified by Chun Ly, 20 August 2018
+     - Handle negative peak in curve_fit
     '''
 
     lamb0 = spec1d['wave']
@@ -78,15 +80,17 @@ def main(wave, spec1d, OH_arr, ax):
                np.abs(lamb0[xx]-wave[ii]) < 1.0]
         max0 = max(flux0[idx])
         p0 = [med0, max0, wave[ii], 0.4]
-        param_bounds = ((0.995*med0, 0.9*max0, wave[ii]-0.2, 0),
-                        (1.005*med0, 1.1*max0, wave[ii]+0.2, np.inf))
+        if max0 > 0:
+            param_bounds = ((0.995*med0, 0.9*max0, wave[ii]-0.2, 0),
+                            (1.005*med0, 1.1*max0, wave[ii]+0.2, np.inf))
 
-        popt, pcov = curve_fit(gauss1d, lamb0, flux0, p0=p0, bounds=param_bounds)
-        center0 = popt[2]
-        sigma0  = popt[3]
-        sig_idx = np.where(np.abs(lamb0-center0)/sigma0 <= 2.5)[0]
-        int_flux = np.sum(flux0[sig_idx] - popt[0])
-
+            popt, pcov = curve_fit(gauss1d, lamb0, flux0, p0=p0, bounds=param_bounds)
+            center0 = popt[2]
+            sigma0  = popt[3]
+            sig_idx = np.where(np.abs(lamb0-center0)/sigma0 <= 2.5)[0]
+            int_flux = np.sum(flux0[sig_idx] - popt[0])
+        else:
+            print('Negative value for peak')
 
         print ii, wave[ii], center0, sigma0, int_flux, len(sig_idx), rms0, \
             rms0*np.sqrt(len(sig_idx))
