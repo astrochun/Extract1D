@@ -21,6 +21,9 @@ rousselot_file = co_dir + '/' + 'rousselot2000.dat'
 rousselot_data = asc.read(rousselot_file, format='commented_header')
 
 from plt_2d_1d import wave0, name0
+
+from ..extract import mlog
+
 import line_fitting
 
 bbox_props = dict(boxstyle="square,pad=0.15", fc="white",
