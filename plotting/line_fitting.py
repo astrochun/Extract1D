@@ -53,6 +53,7 @@ def main(wave, spec1d, OH_arr, ax):
      - Annotate plot with line fitting properties
     Modified by Chun Ly, 20 August 2018
      - Handle negative peak in curve_fit
+     - Fix annotated text for no measurements
     '''
 
     lamb0 = spec1d['wave']
@@ -92,6 +93,11 @@ def main(wave, spec1d, OH_arr, ax):
         else:
             print('Negative value for peak')
 
+            center0  = -1
+            sigma0   = -1
+            int_flux = 0
+            sig_idx  = []
+
         print ii, wave[ii], center0, sigma0, int_flux, len(sig_idx), rms0, \
             rms0*np.sqrt(len(sig_idx))
         ax.plot(lamb0, gauss1d(lamb0, *popt), color='g')
@@ -100,7 +106,11 @@ def main(wave, spec1d, OH_arr, ax):
         fit_annot[0] += '%.1f, ' % center0
         fit_annot[1] += '%.3f, ' % (int_flux / Ha_flux)
         fit_annot[2] += '%.1f, ' % (sigma0 * 10)
-        fit_annot[3] += '%.1f, ' % (int_flux / (rms0*np.sqrt(len(sig_idx))))
+        if len(sig_idx) > 0:
+            fit_annot[3] += '%.1f, ' % (int_flux / (rms0*np.sqrt(len(sig_idx))))
+        else:
+            fit_annot[3] += '%.1f, ' % (int_flux)
+
     #endfor
     fit_annot0 = '\n'.join([a[:-2] for a in fit_annot])
     ax.annotate(fit_annot0, (0.025,0.90), ha='left', va='top', color='orange',
