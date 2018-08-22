@@ -281,6 +281,8 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
     Modified by Chun Ly, 17 August 2018
      - Change dbfile to filename (relative to path0)
      - Change med0 (use center) for cont case; Call db_index correctly
+    Modified by Chun Ly, 22 August 2018
+     - Force peak coordinates as integer
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -378,7 +380,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
 
             bad0 = np.where(np.isnan(med0))[0]
             if len(bad0) > 0: med0[bad0] = 0.0
-            t_coord = coords[nn][0]
+            t_coord = np.int(coords[nn][0])
             p0 = [0.0, med0[t_coord], t_coord, 2.0]
             x0 = 1+np.arange(len(med0))
             popt, pcov = curve_fit(gauss1d, x0, med0, p0=p0)
@@ -403,12 +405,12 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
         if sp_type == 'line':
             if direction == 'x':
                 t_spec0 = spec2d[:,np.int(coords[nn][0]-1)]
-                t_coord = coords[nn][1]
+                t_coord = np.int(coords[nn][1])
                 t_peak  = t_spec0[t_coord]
 
             if direction == 'y':
                 t_spec0 = spec2d[np.int(coords[nn][1]-1),:]
-                t_coord = coords[nn][0]
+                t_coord = np.int(coords[nn][0])
                 t_peak  = t_spec0[t_coord]
             p0 = [0.0, t_peak, t_coord, 2.0]
             x0 = 1+np.arange(len(t_spec0))
