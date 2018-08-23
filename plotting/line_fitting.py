@@ -56,6 +56,8 @@ def main(wave, spec1d, OH_arr, ax):
      - Fix annotated text for no measurements
     Modified by Chun Ly, 23 August 2018
      - Move annotation to upper right
+     - Plot residuals of fit
+     - Move plotting up for when fitting occurs
     '''
 
     lamb0 = spec1d['wave']
@@ -92,6 +94,16 @@ def main(wave, spec1d, OH_arr, ax):
             sigma0  = popt[3]
             sig_idx = np.where(np.abs(lamb0-center0)/sigma0 <= 2.5)[0]
             int_flux = np.sum(flux0[sig_idx] - popt[0])
+
+            fit0 = gauss1d(lamb0, *popt)
+
+            ax.plot(lamb0, fit0, color='g')
+            if ii == 0: Ha_flux = int_flux
+
+            # Plot residuals
+            resid0 = (flux0 - fit0)
+            ax.plot(lamb0[sig_idx], resid0[sig_idx], color='r',
+                    linestyle='-', linewidth=0.5)
         else:
             print('Negative value for peak')
 
@@ -102,8 +114,6 @@ def main(wave, spec1d, OH_arr, ax):
 
         print ii, wave[ii], center0, sigma0, int_flux, len(sig_idx), rms0, \
             rms0*np.sqrt(len(sig_idx))
-        ax.plot(lamb0, gauss1d(lamb0, *popt), color='g')
-        if ii == 0: Ha_flux = int_flux
 
         fit_annot[0] += '%.1f, ' % center0
         fit_annot[1] += '%.3f, ' % (int_flux / Ha_flux)
