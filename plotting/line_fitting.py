@@ -54,6 +54,8 @@ def main(wave, spec1d, OH_arr, ax):
     Modified by Chun Ly, 20 August 2018
      - Handle negative peak in curve_fit
      - Fix annotated text for no measurements
+    Modified by Chun Ly, 23 August 2018
+     - Move annotation to upper right
     '''
 
     lamb0 = spec1d['wave']
@@ -113,7 +115,7 @@ def main(wave, spec1d, OH_arr, ax):
 
     #endfor
     fit_annot0 = '\n'.join([a[:-2] for a in fit_annot])
-    ax.annotate(fit_annot0, (0.025,0.90), ha='left', va='top', color='orange',
+    ax.annotate(fit_annot0, (0.95,0.90), ha='right', va='top', color='orange',
                 bbox=bbox_props, xycoords='axes fraction', zorder=6,
                 fontsize=10)
 
