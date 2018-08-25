@@ -201,7 +201,7 @@ def db_index(center0, coords, sigma0, distort_shift, spec2d_shape, direction='')
 
     distort_idx = np.where(tmp_idx == 1)
 
-    return distort_idx, tmp_idx
+    return distort_idx, tmp_idx, ds_trace
 #enddef
 
 def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
@@ -405,9 +405,10 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
                 cont_pd = np.poly1d(cont_best_fit)
                 cont_distort_shift = cont_pd(np.arange(n_pix))
 
-                idx0, tmp_idx = db_index(center0, [coords[nn],n_pix/2], sigma0,
-                                         cont_distort_shift, spec2d.shape,
-                                         direction=direction)
+                idx0, tmp_idx, \
+                    ds_trace = db_index(center0, [coords[nn],n_pix/2], sigma0,
+                                        cont_distort_shift, spec2d.shape,
+                                        direction=direction)
 
         if sp_type == 'line':
             if direction == 'x':
@@ -431,9 +432,10 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
             if dbfile == '':
                 idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
             else:
-                idx0, tmp_idx = db_index(center0, coords[nn], sigma0,
-                                         distort_shift, spec2d.shape,
-                                         direction=direction)
+                idx0, tmp_idx, \
+                    ds_trace = db_index(center0, coords[nn], sigma0,
+                                        distort_shift, spec2d.shape,
+                                        direction=direction)
 
         idx1 = np.where(np.abs(x0 - center0) <= 15.0)[0]
 
