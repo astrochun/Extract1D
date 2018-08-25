@@ -285,6 +285,8 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Force peak coordinates as integer
     Modified by Chun Ly, 24 August 2018
      - Handle 2-D edge extraction (broadcast input array error) [cont'd]
+    Modified by Chun Ly, 25 August 2018
+     - Plot results of distortion solution
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -369,6 +371,9 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
     t_x0    = np.arange(len(t_spec2))
     center0 = np.argmax(t_spec2)
     neg_off = find_negative_images(t_x0, t_spec2, center0, np.max(t_spec2))
+
+    out_pdf = path0+'extract_QA.pdf'
+    fig, ax = plt.subplots()
 
     for nn in range(n_aper):
         if len(coords[nn]) == 1: sp_type = 'cont'
