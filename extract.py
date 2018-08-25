@@ -284,7 +284,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
     Modified by Chun Ly, 22 August 2018
      - Force peak coordinates as integer
     Modified by Chun Ly, 24 August 2018
-     - Handle 2-D edge extraction (broadcast input array error)
+     - Handle 2-D edge extraction (broadcast input array error) [cont'd]
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -459,14 +459,13 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
         spec1d_arr[nn,:] = spec1d
 
         n_width = t_spec2d.shape[0]
-        if n_width < 30:
-            spec2d_arr[nn, 0:n_width,:] = t_spec2d
-            spec2d_neg1[nn,0:n_width,:] = t_spec2d_N1
-            spec2d_neg2[nn,0:n_width,:] = t_spec2d_N2
-        else:
-            spec2d_arr[nn,:,:] = t_spec2d
-            spec2d_neg1[nn,:,:] = t_spec2d_N1
-            spec2d_neg2[nn,:,:] = t_spec2d_N2
+        spec2d_arr[nn, 0:n_width,:] = t_spec2d
+
+        n_width_N1 = t_spec2d_N1.shape[0]
+        spec2d_neg1[nn,0:n_width_N1,:] = t_spec2d_N1
+
+        n_width_N2 = t_spec2d_N2.shape[1]
+        spec2d_neg2[nn,0:n_width_N2,:] = t_spec2d_N2
     #endfor
 
     spec2d_hdr['CRVAL1'] = lam0_min
