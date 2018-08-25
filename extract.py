@@ -464,7 +464,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
         n_width_N1 = t_spec2d_N1.shape[0]
         spec2d_neg1[nn,0:n_width_N1,:] = t_spec2d_N1
 
-        n_width_N2 = t_spec2d_N2.shape[1]
+        n_width_N2 = t_spec2d_N2.shape[0]
         spec2d_neg2[nn,0:n_width_N2,:] = t_spec2d_N2
     #endfor
 
