@@ -13,6 +13,7 @@ from astropy.io import fits
 
 import numpy as np
 
+import itertools
 from scipy.optimize import curve_fit
 from scipy.interpolate import interp1d
 
@@ -292,6 +293,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
     Modified by Chun Ly, 25 August 2018
      - Plot results of distortion solution
      - Plot 2-D spectra with distortion solutions overlaid
+     - Plot aesthetics: Specify line color, modify line styles, add legend
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -384,6 +386,8 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
     norm = ImageNormalize(vmin=z2, vmax=z1)
     ax.imshow(spec2d, cmap='Greys', origin='lower', norm=norm)
 
+    colors = itertools.cycle(["r", "b", "g", "m"])
+
     for nn in range(n_aper):
         if len(coords[nn]) == 1: sp_type = 'cont'
         if len(coords[nn]) == 2: sp_type = 'line'
@@ -448,9 +452,14 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
 
         if dbfile != '':
             y_temp = np.arange(len(ds_trace))
-            ax.plot(ds_trace, y_temp, label='Aper #'+str(nn+1))
-            ax.plot(ds_trace+neg_off, y_temp, linestyle='dashed')
-            ax.plot(ds_trace-neg_off, y_temp, linestyle='dashed')
+            ctype = next(colors)
+            ax.plot(ds_trace, y_temp, color=ctype,
+                    linestyle='dashed', alpha=0.5, linewidth=1.0,
+                    label='Aper #'+str(nn+1))
+            ax.plot(ds_trace+neg_off, y_temp, color=ctype,
+                    linestyle='dotted', alpha=0.5, linewidth=1.0)
+            ax.plot(ds_trace-neg_off, y_temp, color=ctype,
+                    linestyle='dotted', alpha=0.5, linewidth=1.0)
 
         idx1 = np.where(np.abs(x0 - center0) <= 15.0)[0]
 
@@ -490,6 +499,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
         spec2d_neg2[nn,0:n_width_N2,:] = t_spec2d_N2
     #endfor
 
+    ax.legend(loc='upper center', fontsize=6)
     mylog.info('Writing : '+out_pdf)
     fig.savefig(out_pdf, bbox_inches='tight')
 
