@@ -294,6 +294,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Plot results of distortion solution
      - Plot 2-D spectra with distortion solutions overlaid
      - Plot aesthetics: Specify line color, modify line styles, add legend
+     - Plot aesthetics: axes labeling
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -499,6 +500,8 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
         spec2d_neg2[nn,0:n_width_N2,:] = t_spec2d_N2
     #endfor
 
+    ax.set_yticklabels([])
+    ax.set_xlabel('X [pix]')
     ax.legend(loc='upper center', fontsize=6)
     mylog.info('Writing : '+out_pdf)
     fig.savefig(out_pdf, bbox_inches='tight')
