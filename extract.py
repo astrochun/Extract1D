@@ -19,6 +19,10 @@ from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 from glob import glob
 
+from astropy.visualization import ZScaleInterval
+zscale = ZScaleInterval()
+from astropy.visualization.mpl_normalize import ImageNormalize
+
 from astropy import log
 
 import logging
@@ -287,6 +291,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Handle 2-D edge extraction (broadcast input array error) [cont'd]
     Modified by Chun Ly, 25 August 2018
      - Plot results of distortion solution
+     - Plot 2-D spectra with distortion solutions overlaid
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -374,6 +379,10 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
 
     out_pdf = path0+'extract_QA.pdf'
     fig, ax = plt.subplots()
+
+    z1, z2 = zscale.get_limits(spec2d)
+    norm = ImageNormalize(vmin=z2, vmax=z1)
+    ax.imshow(spec2d, cmap='Greys', origin='lower', norm=norm)
 
     for nn in range(n_aper):
         if len(coords[nn]) == 1: sp_type = 'cont'
