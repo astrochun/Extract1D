@@ -437,6 +437,12 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
                                         distort_shift, spec2d.shape,
                                         direction=direction)
 
+        if dbfile != '':
+            y_temp = np.arange(len(ds_trace))
+            ax.plot(ds_trace, y_temp, label='Aper #'+str(nn+1))
+            ax.plot(ds_trace+neg_off, y_temp, linestyle='dashed')
+            ax.plot(ds_trace-neg_off, y_temp, linestyle='dashed')
+
         idx1 = np.where(np.abs(x0 - center0) <= 15.0)[0]
 
         # + on 19/04/2018
@@ -474,6 +480,9 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
         n_width_N2 = t_spec2d_N2.shape[0]
         spec2d_neg2[nn,0:n_width_N2,:] = t_spec2d_N2
     #endfor
+
+    mylog.info('Writing : '+out_pdf)
+    fig.savefig(out_pdf, bbox_inches='tight')
 
     spec2d_hdr['CRVAL1'] = lam0_min
     spec2d_hdr['CDELT1'] = lam0_delt
