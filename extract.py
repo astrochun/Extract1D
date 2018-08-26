@@ -295,6 +295,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Plot 2-D spectra with distortion solutions overlaid
      - Plot aesthetics: Specify line color, modify line styles, add legend
      - Plot aesthetics: axes labeling
+     - Plot location of emission lines for extraction
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -425,6 +426,9 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
                                         direction=direction)
 
         if sp_type == 'line':
+            ax.scatter(coords[nn][0], coords[nn][1], marker='o',
+                       edgecolor='red', facecolor='none')
+
             if direction == 'x':
                 t_spec0 = spec2d[:,np.int(coords[nn][0]-1)]
                 t_coord = np.int(coords[nn][1])
