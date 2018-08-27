@@ -304,6 +304,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Plot aesthetics: axes labeling
      - Plot location of emission lines for extraction
      - Annotate input coordinates for emission line extraction
+     - Call db_index to get idx_2d
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -428,7 +429,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
                 cont_pd = np.poly1d(cont_best_fit)
                 cont_distort_shift = cont_pd(np.arange(n_pix))
 
-                idx0, tmp_idx, \
+                idx0, idx_2d, tmp_idx, \
                     ds_trace = db_index(center0, [coords[nn],n_pix/2], sigma0,
                                         cont_distort_shift, spec2d.shape,
                                         direction=direction)
@@ -461,7 +462,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
             if dbfile == '':
                 idx0 = np.where(np.abs(x0 - center0)/sigma0 <= 3.0)[0]
             else:
-                idx0, tmp_idx, \
+                idx0, idx_2d, tmp_idx, \
                     ds_trace = db_index(center0, coords[nn], sigma0,
                                         distort_shift, spec2d.shape,
                                         direction=direction)
@@ -485,8 +486,11 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
         if axis==1: #dispersion along x
             if dbfile == '':
                 spec1d = np.sum(spec2d[idx0,:], axis=0)
+                t_spec2d = spec2d[idx1,:]
             else:
                 spec1d = np.sum(np.multiply(spec2d, tmp_idx), axis=0)
+                #t_spec2d = np.reshape(spec2d[idx_2d], spec2d_arr.shape[1:])
+
             t_spec2d = spec2d[idx1,:]
 
             # + on 19/04/2018
@@ -495,8 +499,12 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
         if axis==0: #dispersion along y
             if dbfile == '':
                 spec1d = np.sum(spec2d[:,idx0], axis=1)
+                t_spec2d = np.transpose(spec2d[:,idx1])
             else:
                 spec1d = np.sum(np.multiply(spec2d, tmp_idx), axis=1)
+                #t_spec2d = np.reshape(spec2d[idx_2d[0],idx_2d[1]],
+                #                      spec2d_arr.shape[1:])
+
             t_spec2d = np.transpose(spec2d[:,idx1])
 
             # + on 19/04/2018
