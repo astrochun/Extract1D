@@ -296,6 +296,7 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
      - Plot aesthetics: Specify line color, modify line styles, add legend
      - Plot aesthetics: axes labeling
      - Plot location of emission lines for extraction
+     - Annotate input coordinates for emission line extraction
     '''
 
     if path0 == '' and filename == '' and Instr == '' and len(coords)==0:
@@ -428,7 +429,10 @@ def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
         if sp_type == 'line':
             ax.scatter(coords[nn][0], coords[nn][1], marker='o',
                        edgecolor='red', facecolor='none')
-
+            c_str = '(%.1f,%.1f)' % (coords[nn][0], coords[nn][1])
+            t_coord = [coords[nn][0], coords[nn][1]+0.03*spec2d.shape[1]]
+            ax.annotate(c_str, t_coord, xycoords='data', color='red',
+                        ha='center', va='bottom', fontsize=6)
             if direction == 'x':
                 t_spec0 = spec2d[:,np.int(coords[nn][0]-1)]
                 t_coord = np.int(coords[nn][1])
