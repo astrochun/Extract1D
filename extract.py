@@ -198,15 +198,22 @@ def db_index(center0, coords, sigma0, distort_shift, spec2d_shape, direction='')
 
     ds_trace = center0 + (distort_shift - ds_offset)
 
-    tmp_idx = np.zeros(spec2d_shape)
+    tmp_idx  = np.zeros(spec2d_shape) # for 1-D extraction
+    tmp_idx2 = np.zeros(spec2d_shape) # for 2-D indexing
     for nn in range(n_pix):
         t_idx = np.where(np.abs(x0-ds_trace[nn])/sigma0 <= 3.0)[0]
         if len(t_idx) > 0:
             tmp_idx[nn,t_idx] = 1
 
+        t_idx = np.where(np.abs(x0-ds_trace[nn]) <= 15)[0]
+        if len(t_idx) > 0:
+            tmp_idx2[nn,t_idx] = 1
+
     distort_idx = np.where(tmp_idx == 1)
 
-    return distort_idx, tmp_idx, ds_trace
+    idx_2d = np.where(tmp_idx2 == 1)
+
+    return distort_idx, idx_2d, tmp_idx, ds_trace
 #enddef
 
 def main(path0='', filename='', Instr='', coords=[], direction='', dbfile=''):
