@@ -74,6 +74,8 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
      - Fix ax.axvspan bug for zspec=-1
      - Fix spectral range (proper units)
      - Correct wave (proper units)
+    Modified by Chun Ly,  5 September 2018
+     - Write line fitting table
     '''
 
     if path0 == '' and Instr == '':
@@ -186,7 +188,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         if zspec[nn] != -1:
             wave = np.array(wave0)*(1+zspec[nn])/l_scale
             spec1d = {'wave': tx, 'flux': ty}
-            ax = line_fitting.main(wave, spec1d, OH_arr[x_idx], ax)
+            ax, tab0 = line_fitting.main(wave, spec1d, OH_arr[x_idx], ax)
         #endif
 
         plt.subplots_adjust(left=0.025, bottom=0.025, top=0.975, right=0.975,
@@ -197,6 +199,10 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         out_pdf = '%sextract_1d_%02i.spec.pdf' % (path0, nn+1)
         print('### Writing : '+out_pdf)
         fig.savefig(out_pdf, bbox_inches='tight')
+
+        tab_outfile = '%sextract_fit_%02i.tbl' % (path0, nn+1)
+        print('### Writing : '+tab_outfile)
+        tab0.writeto(tab_outfile, format='ascii.fixed_width_two_line')
     #endfor
 
 #enddef
