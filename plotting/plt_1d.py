@@ -192,7 +192,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
 
             tab_outfile = '%sextract_fit_%02i.tbl' % (path0, nn+1)
             print('### Writing : '+tab_outfile)
-            tab0.writeto(tab_outfile, format='ascii.fixed_width_two_line')
+            tab0.write(tab_outfile, format='ascii.fixed_width_two_line')
         #endif
 
         plt.subplots_adjust(left=0.025, bottom=0.025, top=0.975, right=0.975,
