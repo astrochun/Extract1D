@@ -76,6 +76,7 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
      - Correct wave (proper units)
     Modified by Chun Ly,  5 September 2018
      - Write line fitting table
+     - Move tab0 writing to within if statement
     '''
 
     if path0 == '' and Instr == '':
