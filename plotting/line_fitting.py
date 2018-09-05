@@ -41,6 +41,9 @@ def main(wave, spec1d, OH_arr, ax):
     -------
     ax with Gaussian fits overlaid
 
+    tab0: astropy.Table
+      Table containing fitting results
+
     Notes
     -----
     Created by Chun Ly, 1 April 2018
@@ -60,6 +63,7 @@ def main(wave, spec1d, OH_arr, ax):
      - Move plotting up for when fitting occurs
     Modified by Chun Ly, 5 September 2018
      - Define arrays to pass to astropy.Table
+     - Define tab0 astropy.table, return in call
     '''
 
     lamb0 = spec1d['wave']
@@ -141,6 +145,11 @@ def main(wave, spec1d, OH_arr, ax):
                 fontsize=10)
 
     ax.axhspan(med0-rms0,med0+rms0, facecolor='red', alpha=0.2)
-    return ax
+
+    arr0   = [ctr_arr, sig_arr, flux_arr, SNR_arr]
+    names0 = ['Center', 'Sigma', 'Flux', 'S/N']
+    tab0 = Table(arr0, names=names0)
+
+    return ax, tab0
 #enddef
 
