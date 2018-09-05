@@ -189,6 +189,10 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
             wave = np.array(wave0)*(1+zspec[nn])/l_scale
             spec1d = {'wave': tx, 'flux': ty}
             ax, tab0 = line_fitting.main(wave, spec1d, OH_arr[x_idx], ax)
+
+            tab_outfile = '%sextract_fit_%02i.tbl' % (path0, nn+1)
+            print('### Writing : '+tab_outfile)
+            tab0.writeto(tab_outfile, format='ascii.fixed_width_two_line')
         #endif
 
         plt.subplots_adjust(left=0.025, bottom=0.025, top=0.975, right=0.975,
@@ -200,9 +204,6 @@ def main(path0='', Instr='', zspec=[], Rspec=3000):
         print('### Writing : '+out_pdf)
         fig.savefig(out_pdf, bbox_inches='tight')
 
-        tab_outfile = '%sextract_fit_%02i.tbl' % (path0, nn+1)
-        print('### Writing : '+tab_outfile)
-        tab0.writeto(tab_outfile, format='ascii.fixed_width_two_line')
     #endfor
 
 #enddef
