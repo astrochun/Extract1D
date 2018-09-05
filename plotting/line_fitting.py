@@ -58,6 +58,8 @@ def main(wave, spec1d, OH_arr, ax):
      - Move annotation to upper right
      - Plot residuals of fit
      - Move plotting up for when fitting occurs
+    Modified by Chun Ly, 5 September 2018
+     - Define arrays to pass to astropy.Table
     '''
 
     lamb0 = spec1d['wave']
@@ -76,9 +78,14 @@ def main(wave, spec1d, OH_arr, ax):
     #ax.axhline(y=med0,color='magenta')
 
     rms0 = np.std(flux0[unmask])
-    print rms0
+    # print rms0
 
     fit_annot = ['', 'flux = ', r'$\sigma(\AA)$ = ', 'S/N = ']
+
+    ctr_arr  = np.zeros(n_lines)
+    sig_arr  = np.zeros(n_lines)
+    flux_arr = np.zeros(n_lines)
+    SNR_arr  = np.zeros(n_lines)
 
     for ii in range(n_lines):
         idx = [xx for xx in range(len(lamb0)) if
@@ -112,14 +119,18 @@ def main(wave, spec1d, OH_arr, ax):
             int_flux = 0
             sig_idx  = []
 
-        print ii, wave[ii], center0, sigma0, int_flux, len(sig_idx), rms0, \
-            rms0*np.sqrt(len(sig_idx))
+        ctr_arr[ii]  = center0
+        sig_arr[ii]  = sigma0
+        flux_arr[ii] = int_flux
+        SNR_arr[ii]  = int_flux / (rms0*np.sqrt(len(sig_idx)))
+        #print ii, wave[ii], center0, sigma0, int_flux, len(sig_idx), rms0, \
+        #    rms0*np.sqrt(len(sig_idx))
 
         fit_annot[0] += '%.1f, ' % center0
         fit_annot[1] += '%.3f, ' % (int_flux / Ha_flux)
         fit_annot[2] += '%.1f, ' % (sigma0 * 10)
         if len(sig_idx) > 0:
-            fit_annot[3] += '%.1f, ' % (int_flux / (rms0*np.sqrt(len(sig_idx))))
+            fit_annot[3] += '%.1f, ' % (SNR_arr[ii])
         else:
             fit_annot[3] += '%.1f, ' % (int_flux)
 
